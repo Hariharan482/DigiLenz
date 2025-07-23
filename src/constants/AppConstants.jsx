@@ -1,4 +1,5 @@
 export const navigation = ['Dashboard','My Assets','Experience Score','Reports','Alerts','Settings','Help'];
+
 export const icons = {
     dashboard : 'home',
     myassets : 'business_center',
@@ -8,6 +9,7 @@ export const icons = {
     settings : 'settings',
     help : 'help'
 }
+
 export const RouteConstants = {
     home : '/',
     all : '*',
@@ -19,3 +21,5 @@ export const RouteConstants = {
     settings : '/settings',
     help : '/help'
 }
+
+export const user = 'Rubesh';

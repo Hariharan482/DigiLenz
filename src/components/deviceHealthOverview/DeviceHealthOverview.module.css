@@ -1,0 +1,49 @@
+.device-health-chart{
+    border: 2px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 24px;
+    width: 45%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.chart-heading{
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 24px 0;
+    color: #1F2937;
+}
+.chart-container{
+    display: flex; 
+    align-items: center; 
+    gap: 25px;
+}
+.pie-chart{
+    width: 200px; 
+    height: 200px;
+    position: relative;
+}
+.legend-container{
+    flex: 1;
+}
+.legend-item{
+    display: flex; 
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+.legend-color-indicator{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.legend-label{
+    color: #6B7280;
+    flex: 1;
+}
+.legend-value{
+    font-weight: 600;
+    color: #1F2937;
+    font-size: 16px;
+}

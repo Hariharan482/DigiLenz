@@ -1,0 +1,15 @@
+.dashboard{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 50px;
+}
+.greeting{
+    font-size: 35px;
+    font-weight: 600;
+}
+.dashboard-charts{
+    display: flex;
+    gap: 40px;
+    width: 100%;
+}

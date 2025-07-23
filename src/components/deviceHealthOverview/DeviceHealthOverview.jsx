@@ -9,11 +9,11 @@ export default function DeviceHealthOverview() {
     labels: ['<50%', '<75%', '<90%'],
     datasets: [
         {
-        data: [2, 3, 5], // Actual values: 2, 3, 5
+        data: [2, 3, 4], 
         backgroundColor: [
-            '#FF8A50', // Orange for <50%
-            '#4F46E5', // Blue for <75% 
-            '#FEB572', // Light orange for <90%
+            '#FF8A50', 
+            '#4F46E5', 
+            '#FEB572', 
         ],
         borderWidth: 0,
         cutout: '65%',
@@ -26,7 +26,7 @@ export default function DeviceHealthOverview() {
     maintainAspectRatio: false,
     plugins: {
         legend: {
-        display: false, // We'll create custom legend
+        display: false, 
         },
         tooltip: {
         enabled: true,
@@ -46,9 +46,9 @@ export default function DeviceHealthOverview() {
     };
 
     const legendItems = [
-    { color: '#FF8A50', label: 'No of Devices < 50%', value: 2 },
-    { color: '#4F46E5', label: 'No of Devices < 75%', value: 3 },
-    { color: '#FEB572', label: 'No of Devices < 90%', value: 5 },
+    { color: '#FF8A50', label: 'No of Devices < 50%', value: data.datasets[0].data[0] },
+    { color: '#4F46E5', label: 'No of Devices < 75%', value: data.datasets[0].data[1] },
+    { color: '#FEB572', label: 'No of Devices < 90%', value: data.datasets[0].data[2] },
     ];
   return (
     <div className={style['device-health-chart']}>

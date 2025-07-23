@@ -1,0 +1,27 @@
+.link{
+    display: flex;
+    gap: 20px;
+    text-decoration: none;
+    color: #000;
+    padding: 10px;
+    border-left: solid 5px #fff;
+}
+.link:hover{
+    cursor: pointer;
+    color: #BD4B4D;
+    background-color: #F1DDDB;
+}
+.active-link{
+    display: flex;
+    gap: 20px;
+    text-decoration: none;
+    color: #BD4B4D;
+    background-color: #F1DDDB;
+    padding: 10px;
+    position: relative;
+    border-left: solid 5px #000;
+}
+.material-symbols-outlined {
+    font-family: 'Material Icons';
+    font-size: 20px;
+}

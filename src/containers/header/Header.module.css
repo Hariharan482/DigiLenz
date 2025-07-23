@@ -1,0 +1,19 @@
+.header{
+    display: flex;
+    gap: 15px;
+    justify-content: end;
+    padding: 20px 50px;
+    border-bottom: 2px solid #EEDDEE;
+}
+.material-symbols-outlined {
+    font-family: 'Material Icons';
+    font-size: 30px;
+    cursor: pointer;
+}
+.profile{
+    width: 30px;
+    height: 30px;
+    border-radius: 20%;
+    background-color: #F1DDDB;
+    cursor: pointer;
+}

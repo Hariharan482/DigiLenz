@@ -1,6 +1,8 @@
 import DeviceHealthOverview from "../../components/deviceHealthOverview/DeviceHealthOverview";
 import DeviceByAgeChart from "../../components/devicesByAgeChart/DevicesByAgeChart";
 import DeviceHealthSummary from "../../components/deviceHealthSummary/DeviceHealthSummary";
+import PlaceholderReport from "../../components/placeholderReport/PlaceholderReport";
+import AssetsNotDiscovered from "../../components/assetsNotDiscovered/AssetsNotDiscovered";
 import { user } from '../../constants/AppConstants';
 import style from './Dashboard.module.css';
 
@@ -12,8 +14,10 @@ export default function Dashboard(){
                 <DeviceHealthOverview/>
                 <DeviceByAgeChart/>
             </div>
-            <div className={style['dashboard-second-row'] }>
+            <div className={style['dashboard-second-row']}>
                 <DeviceHealthSummary />
+                <PlaceholderReport />
+                <AssetsNotDiscovered />
             </div>
         </div>
     )

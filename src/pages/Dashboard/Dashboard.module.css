@@ -17,3 +17,17 @@
     gap: 40px;
     width: 100%;
 }
+.dashboard-second-row {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  margin-top: 24px;
+  width: 100%;
+}
+.dashboard-second-row > * {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 380px;
+  max-width: 100%;
+  box-sizing: border-box;
+}

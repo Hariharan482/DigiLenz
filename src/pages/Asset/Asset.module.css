@@ -1,0 +1,145 @@
+.assetPage{
+  width: 90%;
+  margin: auto;
+  margin-top: 4rem;
+  row-gap: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.assetSummaryContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.assetCard {
+  background: #a2b49c33;
+  border-radius: 8px;
+  padding: 12px 32px;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  color: #333;
+}
+
+.assetCard.inactive {
+  background: #ffe7a6;
+}
+
+.assetCard.download {
+  background: #8fa2b8;
+  color: #fff;
+  justify-content: center;
+}
+
+.assetTableWrapper {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px 0 #0001;
+}
+
+.assetTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.assetTable thead tr {
+  background: #f3e0e0;
+}
+
+.assetTable th {
+  font-weight: bold;
+  padding: 16px 12px;
+  text-align: left;
+  color: #3d2323;
+}
+
+.assetTable tbody tr {
+  background: #fff;
+  border-bottom: 1px solid #f3e0e0;
+}
+
+.assetTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.assetTable td {
+  padding: 14px 12px;
+  color: #3d2323;
+  vertical-align: middle;
+}
+
+.assetTable tbody td:last-child {
+  display: flex;
+  justify-content: space-between;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.statusDot.active {
+  background: #1ecb4f;
+}
+.statusDot.inactive {
+  background: #e13b3b;
+}
+.actionLinks{
+  display: flex;
+  width: 50%;
+  justify-content: space-between;
+}
+
+.actionLink {
+  color: #3b8ee1;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.paginationWrapper {
+  background: #f3e0e0;
+  border-radius: 0 0 16px 16px;
+  padding: 18px 0 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paginationBtn {
+  background: none;
+  border: none;
+  color: #e13b3b;
+  font-size: 1.5rem;
+  margin: 0 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.paginationBtn:disabled {
+  color: #e0bcbc;
+  cursor: not-allowed;
+}
+
+.paginationDot {
+  width: 10px;
+  height: 10px;
+  background: #e13b3b;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 6px;
+}

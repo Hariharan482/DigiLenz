@@ -2,7 +2,7 @@ import {Route, Routes} from 'react-router-dom';
 import { RouteConstants } from './constants/AppConstants';
 import './App.css';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Asset from './pages/Asset';
+import Asset from './pages/Asset/Asset';
 import Layout from './pages/Layout';
 import PageNotFound from './pages/PageNotFound';
 

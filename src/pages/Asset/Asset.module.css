@@ -33,6 +33,7 @@
   background: #8fa2b8;
   color: #fff;
   justify-content: center;
+  cursor: pointer;
 }
 
 .assetTableWrapper {

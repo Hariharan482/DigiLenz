@@ -9,7 +9,6 @@ export default function NavBar(){
             <NavLink to={RouteConstants.dashboard} className={style['logo-link']}><img src={logo} alt='logo' className={style['logo']}/></NavLink>
             <div className={style['navigation']}>
                 {navigation.map((nav,index)=>{
-                    console.log(nav.toLowerCase().replace(/\s/g, ''));
                     return <Navigation nav={nav} key={index}/>
                 })}
             </div>

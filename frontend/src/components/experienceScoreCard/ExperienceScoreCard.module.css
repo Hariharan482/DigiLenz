@@ -1,0 +1,18 @@
+.experience-score-card{
+    width: 250px;
+    height: 80px;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+.score-label{
+    font-size: 18px;
+    font-weight: 600;
+    color: #6B7280;
+    margin-bottom: 8px;
+}
+.score-value{
+    font-size: 35px;
+    font-weight: 700;
+    color: #1F2937;
+}

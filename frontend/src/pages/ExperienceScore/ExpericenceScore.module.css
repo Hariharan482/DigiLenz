@@ -1,0 +1,15 @@
+.experience-score-container{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+}
+.experience-score-heading{
+    font-size: 30px;
+    font-weight: 600;
+    color: #111827;
+}
+.experience-score{
+    display: flex;
+    gap: 20px;
+}

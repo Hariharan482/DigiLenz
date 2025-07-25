@@ -1,17 +1,48 @@
-import React from "react";
-import { useState } from "react";
+import React, { use } from "react";
+import { useState,useEffect } from "react";
 import { mockData } from "../../constants/AssetData";
 import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
+import getData from "../../services/GetData";
+import { assetListAPI } from "../../constants/ApiConstants";
 
 const rowsPerPage = 8;
 
 const AssetList = () => {
   const [page, setPage] = useState(1);
   const [assetDetails, setAssetDetails] = useState(false);
+  const [assetList, setAssetList] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const totalPages = Math.ceil(mockData.length / rowsPerPage);
   const startId = (page - 1) * rowsPerPage;
   const pageData = mockData.slice(startId, startId + rowsPerPage);
+
+  useEffect(()=>{
+    setLoading(true);
+    getData(assetListAPI+'page=1&page_size=10')
+    .then((APIdata)=> {
+      if(!APIdata.ok){
+        throw new Error('HTTP error');
+      }
+      else{
+        return APIdata.json()
+      }
+      
+    })
+    .then((res_data)=> {
+      setAssetList(res_data);
+      setLoading(false);
+      setError(false);
+    })
+    .catch((error) => {
+      console.log(error);
+      console.error('Error fetching asset data:', error);
+      setLoading(false);
+      setError(true);
+    });
+  },[]);
+  
 
   return (
     <div className={styles.assetTableWrapper}>

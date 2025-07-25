@@ -65,7 +65,7 @@ def get_asset_details(serial_number: str):
         logger.error(f"Error fetching asset details: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/assetmetrics", status_code=status.HTTP_201_CREATED)
 def create_asset_metrics(assetMetrics: AssetMetrics):
     """Create a new asset metrics entry."""
     logger.info("Received asset metrics creation request")

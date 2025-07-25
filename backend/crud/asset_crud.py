@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from utils.calculate_customer_experience_score import calculate_customer_experience_score
 from db.mongodb import mongodb
 from models.schemas import Asset, AssetMetrics
 from typing import List, Optional
@@ -66,13 +67,6 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dic
     ]
     
     return list(collection.aggregate(pipeline))
-
-def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
-    """Create a new asset metrics entry in the database."""
-    asset_metrics_dict = asset_metrics.model_dump(by_alias=True)
-    collection = mongodb.get_collection("asset_metrics")
-    result = collection.insert_one(asset_metrics_dict)
-    return result.inserted_id
 
 def categorize_assets()->dict:
     """Categorize assets based on health score."""
@@ -161,3 +155,83 @@ def get_inactive_assets_count() -> int:
     now = datetime.now()
     threshold_date = now.replace(year=now.year - 1)
     return collection.count_documents({"last_active": {"$lt": threshold_date}})
+
+def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
+    """Create a new asset metrics entry in the database."""
+    try:
+        asset_metrics_dict = asset_metrics.model_dump(by_alias=True)
+        collection = mongodb.get_collection("asset_metrics")
+        result = collection.insert_one(asset_metrics_dict)
+        inserted_id = str(result.inserted_id)
+    except Exception as e:
+        print(f"Error creating asset metrics: {str(e)}")
+        raise
+
+    # Define time window for aggregation
+    time_threshold = datetime.now() - timedelta(days=90)
+
+    # Aggregate metrics for the asset over the time window
+    pipeline = [
+        {"$match": {"serial_number": asset_metrics.serial_number, "timestamp": {"$gte": time_threshold}}},
+        {"$group": {
+            "_id": "$serial_number",
+            "avg_cpu_usage_percent": {"$avg": "$cpu_usage_percent"},
+            "avg_memory_used_percent": {"$avg": "$memory_used_percent"},
+            "avg_total_disk_used_percent": {"$avg": "$total_disk_used_percent"},
+            "avg_battery_percent": {"$avg": "$battery_percent"},
+            "battery_present": {"$max": "$battery_present"}
+        }}
+    ]
+
+    agg_result = list(collection.aggregate(pipeline))
+    if not agg_result:
+        # No recent metrics, optionally clear health score and averages
+        assets_collection = mongodb.get_collection("assets")
+        assets_collection.update_one(
+            {"serial_number": asset_metrics.serial_number},
+            {"$set": {
+                "health_score": None,
+                "average_cpu": None,
+                "average_memory": None,
+                "average_battery": None
+            }}
+        )
+        return inserted_id
+    aggregated = agg_result[0]
+
+    # Get the metrics values
+    avg_cpu = aggregated.get("avg_cpu_usage_percent", 0.0)
+    avg_memory = aggregated.get("avg_memory_used_percent", 0.0)
+    avg_battery = aggregated.get("avg_battery_percent")
+    
+    # Calculate the customer experience score
+    ces_score = calculate_customer_experience_score(
+        average_cpu=avg_cpu,
+        average_memory=avg_memory,
+        average_battery=avg_battery
+    )
+
+    result_one = {
+        "health_score": ces_score,
+        "average_cpu": avg_cpu,
+        "average_memory": avg_memory,
+        "average_battery": avg_battery,
+        "last_active": datetime.now()
+    }
+    
+    print(result_one)
+
+    # Update the Asset document with score and averages
+    assets_collection = mongodb.get_collection("assets")
+    assets_collection.update_one(
+        {"serial_number": asset_metrics.serial_number},
+        {"$set": {
+            "health_score": ces_score,
+            "average_cpu": avg_cpu,
+            "average_memory": avg_memory,
+            "average_battery": avg_battery,
+            "last_active": datetime.now() 
+        }}
+    )
+
+    return inserted_id

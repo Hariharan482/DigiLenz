@@ -23,5 +23,6 @@ def create_asset_metrics(assetMetrics: AssetMetrics):
             content={"id": str(inserted_id), "message": "Asset metrics saved successfully"}
         )
     except Exception as e:
+        print(e)
         logger.error(f"Error creating asset metrics: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

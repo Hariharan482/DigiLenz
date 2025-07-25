@@ -32,3 +32,8 @@ def get_inactive_assets_count() -> int:
     """Get count of inactive assets."""
     from crud.asset_crud import get_inactive_assets_count
     return get_inactive_assets_count()
+
+def get_device_health_summary(score_threshold: int = 70) -> dict:
+    """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
+    from crud.asset_crud import get_device_health_summary
+    return get_device_health_summary(score_threshold)

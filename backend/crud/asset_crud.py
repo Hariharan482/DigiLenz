@@ -297,3 +297,65 @@ def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
     )
 
     return inserted_id
+
+
+def get_device_health_summary(score_threshold=70):
+    """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
+    collection = mongodb.get_collection("assets")
+    now = datetime.utcnow()
+    pipeline = [
+        {
+            "$match": {
+                "health_score": {"$exists": True},
+                "average_cpu": {"$exists": True}
+            }
+        },
+        {
+            "$addFields": {
+                "created": { "$toDate": "$_id" },
+            }
+        },
+        {
+            "$addFields": {
+                "ageInYears": {
+                    "$divide": [
+                        {"$subtract": [now, "$created"]},
+                        1000 * 60 * 60 * 24 * 365
+                    ]
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": None,
+                "avgAge": {"$avg": "$ageInYears"},
+                "avgHealthScore": {"$avg": "$health_score"},
+                "avgCpu": {"$avg": "$average_cpu"},
+                "totalDevices": {"$sum": 1},
+                "belowThreshold": {
+                    "$sum": {
+                        "$cond": [
+                            {"$lt": ["$health_score", score_threshold]},
+                            1,
+                            0
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+
+    result = list(collection.aggregate(pipeline))
+
+    if not result:
+        return None
+
+    data = result[0]
+    percent_below_threshold = (data["belowThreshold"] / data["totalDevices"]) * 100 if data["totalDevices"] > 0 else 0
+
+    return {
+        "AvgAgeYears": round(data["avgAge"], 2),
+        "AvgHealthScore": round(data["avgHealthScore"], 2),
+        "AvgCPUUtilizationPercent": round(data["avgCpu"], 2),
+        "PercentDevicesBelowScoreThreshold": round(percent_below_threshold, 2)
+    }

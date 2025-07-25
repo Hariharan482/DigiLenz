@@ -106,6 +106,16 @@ def get_inactive_assets_count():
         logger.error(f"Error fetching inactive assets count: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
     
+@router.get("/health-summary")
+def get_device_health_summary(score_threshold: int = 70):
+    """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
+    try:
+        from services.asset_service import get_device_health_summary
+        summary = get_device_health_summary(score_threshold)
+        return summary
+    except Exception as e:
+        logger.error(f"Error fetching device health summary: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/{serial_number}")
 def get_asset_details(serial_number: str):
@@ -118,3 +128,4 @@ def get_asset_details(serial_number: str):
     except Exception as e:
         logger.error(f"Error fetching asset details: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+    

@@ -17,6 +17,7 @@ class Asset(BaseModel):
     average_cpu: Optional[float] = None
     average_battery: Optional[float] = None
     average_memory: Optional[float] = None
+    last_active: Optional[datetime] = None
     customer_id: Customer  # Reference to Customer
 
 class AssetMetrics(BaseModel):

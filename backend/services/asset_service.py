@@ -22,3 +22,13 @@ def get_assets_summary_paginated_service(page: int = 1, page_size: int = 10) -> 
 def get_device_health_count() -> dict:
     """Get count of devices by health status."""
     return categorize_assets()
+
+def get_devices_by_age() -> dict:
+    """Get devices categorized by age and health status."""
+    from crud.asset_crud import get_devices_by_age
+    return get_devices_by_age()
+
+def get_inactive_assets_count() -> int:
+    """Get count of inactive assets."""
+    from crud.asset_crud import get_inactive_assets_count
+    return get_inactive_assets_count()

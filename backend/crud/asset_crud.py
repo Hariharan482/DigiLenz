@@ -1,3 +1,4 @@
+from datetime import datetime
 from db.mongodb import mongodb
 from models.schemas import Asset, AssetMetrics
 from typing import List, Optional
@@ -91,3 +92,72 @@ def categorize_assets()->dict:
             result["critical"] += 1
             
     return result
+
+def get_devices_by_age()->dict:
+    collection = mongodb.get_collection("assets")
+    now = datetime.now()
+    pipeline = [{
+        "$addFields": {
+            "ageInYears": {
+                "$divide": [
+                    {"$subtract": [now, "$created"]},
+                    1000 * 60 * 60 * 24 * 365  
+                ]
+            },
+            "healthCategory": {
+                "$switch": {
+                    "branches": [
+                        {"case": {"$gt": ["$health_score", 85]}, "then": "good"},
+                        {"case": {"$gt": ["$health_score", 70]}, "then": "moderate"},
+                    ],
+                    "default": "critical"
+                }
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "ageGroup": {
+                "$switch": {
+                    "branches": [
+                        {"case": {"$lte": ["$ageInYears", 1]}, "then": "0-1 year"},
+                        {"case": {"$lte": ["$ageInYears", 2]}, "then": "1-2 years"},
+                    ],
+                    "default": "2+ years"
+                }
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "healthCategory": "$healthCategory",
+                "ageGroup": "$ageGroup"
+            },
+            "count": {"$sum": 1}
+        }
+    },
+    {
+        "$sort": {
+            "_id.healthCategory": 1,
+            "_id.ageGroup": 1
+        }
+    }]
+
+    result = list(collection.aggregate(pipeline))
+    result = {"good": {}, "moderate": {}, "critical": {}}
+
+    for asset in result:
+        category = asset["_id"]["healthCategory"]
+        age_group = asset["_id"]["ageGroup"]
+        count = asset["count"]
+        result[category][age_group] = count    
+    return result
+
+
+def get_inactive_assets_count() -> int:
+    """Get count of inactive assets."""
+    collection = mongodb.get_collection("assets")
+    now = datetime.now()
+    threshold_date = now.replace(year=now.year - 1)
+    return collection.count_documents({"last_active": {"$lt": threshold_date}})

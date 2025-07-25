@@ -94,3 +94,25 @@ def get_device_health_assets():
     except Exception as e:
         logger.error(f"Error fetching device health count: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.get("/devices-by-age")
+def get_devices_by_age():
+    """Get devices categorized by age and health status."""
+    from services.asset_service import get_devices_by_age
+    try:
+        age_data = get_devices_by_age()
+        return age_data
+    except Exception as e:
+        logger.error(f"Error fetching devices by age: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
+@router.get("/inactive-count")
+def get_inactive_assets_count():
+    """Get count of inactive assets."""
+    from services.asset_service import get_inactive_assets_count
+    try:
+        inactive_count = get_inactive_assets_count()
+        return {"inactive_count": inactive_count}
+    except Exception as e:
+        logger.error(f"Error fetching inactive assets count: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")

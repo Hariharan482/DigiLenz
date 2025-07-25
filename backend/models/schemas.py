@@ -35,7 +35,7 @@ class AssetMetrics(BaseModel):
     timestamp: datetime
     physical_cpu_cores: int
     logical_cpu_cores: int
-    avg_cpu_per_core_usage_percentage: float
+    avg_cpu_per_core_usage_percent: float
     cpu_usage_percent: float
     cpu_freq_current_mhz : Optional[float] = None
     cpu_freq_min_mhz : Optional[float] = None
@@ -43,7 +43,7 @@ class AssetMetrics(BaseModel):
     memory_total_gb: float
     memory_used_gb: float
     memory_free_gb: float
-    memory_usage_percent: float
+    memory_used_percent: float
     swap_total_gb: float
     swap_used_gb: float
     swap_used_percent: float

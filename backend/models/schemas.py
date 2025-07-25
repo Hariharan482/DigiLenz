@@ -17,7 +17,7 @@ class Asset(BaseModel):
     average_cpu: Optional[float] = None
     average_battery: Optional[float] = None
     average_memory: Optional[float] = None
-    customer_id: str  # Reference to Customer
+    customer_id: Customer  # Reference to Customer
 
 class AssetMetrics(BaseModel):
     id: Optional[str] = None  # _id in MongoDB

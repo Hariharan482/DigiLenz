@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from core.logging import logger
@@ -10,15 +8,34 @@ from services.asset_service import (
     get_asset_by_serial_number_service,
     get_assets_summary_paginated_service,
 )
+from typing import Dict
 
 router = APIRouter(prefix="/assets", tags=["assets"])
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_asset(asset: Asset):
+def create_asset(asset: Dict):
     """Create a new asset."""
     logger.info("Received asset creation request")
     try:
-        inserted_id = create_asset_service(asset)
+        # Extract customer_id as string
+        customer_id = asset.get("customer_id")
+        if not customer_id:
+            raise HTTPException(status_code=400, detail="customer_id is required")
+
+        # Fetch customer from DB
+        from db.mongodb import mongodb
+        customer_collection = mongodb.get_collection("customers")
+        customer = customer_collection.find_one({"_id": customer_id})
+
+        if not customer:
+            raise HTTPException(status_code=404, detail=f"Customer with ID '{customer_id}' not found")
+
+        # Replace customer_id with full customer object
+        asset["customer_id"] = customer
+        # Now validate and create Asset model
+        asset_obj = Asset(**asset)
+
+        inserted_id = create_asset_service(asset_obj)
         if not inserted_id:
             logger.error("Asset not saved")
             raise HTTPException(status_code=500, detail="Asset not saved")
@@ -28,8 +45,11 @@ def create_asset(asset: Asset):
             status_code=201,
             content={"id": str(inserted_id), "message": "Asset saved successfully"}
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error creating asset: {str(e)}")
+        print(e)
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/summary")

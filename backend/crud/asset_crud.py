@@ -65,3 +65,9 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dic
     ]
     
     return list(collection.aggregate(pipeline))
+
+def create_asset_metrics_db(asset_metrics: dict) -> str:
+    """Create a new asset metrics entry in the database."""
+    collection = mongodb.get_collection("asset_metrics")
+    result = collection.insert_one(asset_metrics)
+    return result.inserted_id

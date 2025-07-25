@@ -24,6 +24,7 @@ class AssetMetrics(BaseModel):
     hostname: str
     serial_number: str
     device_name: str
+    mac_address:str
     os: str
     os_version: str
     os_release: str
@@ -48,8 +49,10 @@ class AssetMetrics(BaseModel):
     swap_used_percent: float
     total_disk_usage_gb: float
     total_disk_size_gb: float
+    total_disk_used_percent: float
     boot_time_utc: datetime
     uptime_seconds: float
+    uptime_hms: str
     battery_present: bool
     battery_percent: Optional[float] = None
     battery_plugged_in: Optional[bool] = None

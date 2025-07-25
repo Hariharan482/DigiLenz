@@ -3,12 +3,13 @@
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from core.logging import logger
-from models.schemas import Asset
+from models.schemas import Asset, AssetMetrics
 from services.asset_service import (
     create_asset_service,
     get_assets_list_service,
     get_asset_by_serial_number_service,
-    get_assets_summary_paginated_service
+    get_assets_summary_paginated_service,
+    create_asset_metrics_service
 )
 
 router = APIRouter(prefix="/assets", tags=["assets"])
@@ -62,4 +63,23 @@ def get_asset_details(serial_number: str):
         return asset
     except Exception as e:
         logger.error(f"Error fetching asset details: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+def create_asset_metrics(assetMetrics: AssetMetrics):
+    """Create a new asset metrics entry."""
+    logger.info("Received asset metrics creation request")
+    try:
+        inserted_id = create_asset_metrics_service(assetMetrics)
+        if not inserted_id:
+            logger.error("Asset not saved")
+            raise HTTPException(status_code=500, detail="Asset not saved")
+        
+        logger.info(f"Asset saved with id: {inserted_id}")
+        return JSONResponse(
+            status_code=201,
+            content={"message": "Asset metrics created successfully"}
+        )
+    except Exception as e:
+        logger.error(f"Error creating asset metrics: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

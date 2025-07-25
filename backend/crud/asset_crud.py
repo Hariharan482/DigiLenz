@@ -1,5 +1,5 @@
 from db.mongodb import mongodb
-from models.schemas import Asset
+from models.schemas import Asset, AssetMetrics
 from typing import List, Optional
 
 def get_assets_paginated(page: int = 1, page_size: int = 10) -> List[dict]:
@@ -66,8 +66,9 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dic
     
     return list(collection.aggregate(pipeline))
 
-def create_asset_metrics_db(asset_metrics: dict) -> str:
+def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
     """Create a new asset metrics entry in the database."""
+    asset_metrics_dict = asset_metrics.model_dump(by_alias=True)
     collection = mongodb.get_collection("asset_metrics")
-    result = collection.insert_one(asset_metrics)
+    result = collection.insert_one(asset_metrics_dict)
     return result.inserted_id

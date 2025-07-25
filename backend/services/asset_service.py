@@ -1,6 +1,6 @@
 
 from models.schemas import Asset
-from crud.asset_crud import create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated
+from crud.asset_crud import categorize_assets, create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated
 from typing import List, Optional
 
 def create_asset_service(asset: Asset) -> str:
@@ -18,3 +18,22 @@ def get_asset_by_serial_number_service(serial_number: str) -> Optional[dict]:
 def get_assets_summary_paginated_service(page: int = 1, page_size: int = 10) -> List[dict]:
     """Get paginated assets summary with customer info."""
     return get_assets_summary_paginated(page, page_size)
+
+def get_device_health_count() -> dict:
+    """Get count of devices by health status."""
+    return categorize_assets()
+
+def get_devices_by_age() -> dict:
+    """Get devices categorized by age and health status."""
+    from crud.asset_crud import get_devices_by_age
+    return get_devices_by_age()
+
+def get_inactive_assets_count() -> int:
+    """Get count of inactive assets."""
+    from crud.asset_crud import get_inactive_assets_count
+    return get_inactive_assets_count()
+
+def get_device_health_summary(score_threshold: int = 70) -> dict:
+    """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
+    from crud.asset_crud import get_device_health_summary
+    return get_device_health_summary(score_threshold)

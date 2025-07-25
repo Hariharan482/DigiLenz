@@ -1,5 +1,5 @@
 import React, { use } from "react";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { mockData } from "../../constants/AssetData";
 import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
@@ -18,31 +18,28 @@ const AssetList = () => {
   const startId = (page - 1) * rowsPerPage;
   const pageData = mockData.slice(startId, startId + rowsPerPage);
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
-    getData(assetListAPI+'page=1&page_size=10')
-    .then((APIdata)=> {
-      if(!APIdata.ok){
-        throw new Error('HTTP error');
-      }
-      else{
-        return APIdata.json()
-      }
-      
-    })
-    .then((res_data)=> {
-      setAssetList(res_data);
-      setLoading(false);
-      setError(false);
-    })
-    .catch((error) => {
-      console.log(error);
-      console.error('Error fetching asset data:', error);
-      setLoading(false);
-      setError(true);
-    });
-  },[]);
-  
+    getData(assetListAPI + "page=1&page_size=10")
+      .then((APIdata) => {
+        if (!APIdata.ok) {
+          throw new Error("HTTP error");
+        } else {
+          return APIdata.json();
+        }
+      })
+      .then((res_data) => {
+        setAssetList(res_data);
+        setLoading(false);
+        setError(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        console.error("Error fetching asset data:", error);
+        setLoading(false);
+        setError(true);
+      });
+  }, []);
 
   return (
     <div className={styles.assetTableWrapper}>
@@ -73,7 +70,12 @@ const AssetList = () => {
                   {row.status}
                 </span>
                 <span className={styles.actionLinks}>
-                  <div className={styles.actionLink} onClick={()=>setAssetDetails(true)}>Manage</div>
+                  <div
+                    className={styles.actionLink}
+                    onClick={() => setAssetDetails(true)}
+                  >
+                    Manage
+                  </div>
                   <div className={styles.actionLink}>Notify</div>
                 </span>
               </td>
@@ -98,7 +100,15 @@ const AssetList = () => {
           &#62;
         </button>
       </div>
-      {assetDetails && <div className={styles['asset-details-background']}><div className={styles['asset-details-background']} onClick={()=>setAssetDetails(false)}></div> <AssetDetails close={()=>setAssetDetails(false)}/> </div>}
+      {assetDetails && (
+        <div className={styles["asset-details-background"]}>
+          <div
+            className={styles["asset-details-background"]}
+            onClick={() => setAssetDetails(false)}
+          ></div>{" "}
+          <AssetDetails close={() => setAssetDetails(false)} />{" "}
+        </div>
+      )}
     </div>
   );
 };

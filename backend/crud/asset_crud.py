@@ -6,7 +6,18 @@ def get_assets_paginated(page: int = 1, page_size: int = 10) -> List[dict]:
     """Get paginated list of assets with basic info."""
     collection = mongodb.get_collection("assets")
     skip = (page - 1) * page_size
-    projection = {"_id": 0, "serial_number": 1, "host_name": 1, "product_name": 1, "status": 1}
+    projection = {
+        "_id": 0,
+        "serial_number": 1,
+        "product_name": 1,
+        "host_name": 1,
+        "status": 1,
+        "health_score": 1,
+        "average_cpu": 1,
+        "average_battery": 1,
+        "average_memory": 1,
+        "customer_id": 1
+    }
     cursor = collection.find({}, projection).skip(skip).limit(page_size)
     return list(cursor)
 
@@ -38,7 +49,12 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dic
         {"$project": {
             "_id": 0,
             "serial_number": 1,
+            "product_name": 1,
+            "host_name": 1,
+            "status": 1,
             "customer_name": "$customer.customer_name",
+            "customer_email": "$customer.customer_email",
+            "customer_phone": "$customer.customer_phone",
             "average_cpu": 1,
             "average_battery": 1,
             "average_memory": 1,

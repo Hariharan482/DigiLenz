@@ -21,13 +21,38 @@ class Asset(BaseModel):
 
 class AssetMetrics(BaseModel):
     id: Optional[str] = None  # _id in MongoDB
-    serial_number: int = Field(..., alias="serial number")  # Reference to Asset
-    timestamp: Optional[datetime] = None
-    cpu: Optional[float] = None
-    battery: Optional[float] = None
-    memory: Optional[float] = None
-    disk_usage: Optional[float] = None
-    uptime: Optional[float] = None
-    disk_type: Optional[float] = None
-    os_version: Optional[float] = None
-    thermal: Optional[float] = None
+    hostname: str
+    serial_number: str
+    device_name: str
+    os: str
+    os_version: str
+    os_release: str
+    architecture: str
+    machine: str
+    processor: str
+    python_version: str
+    timestamp: datetime
+    physical_cpu_cores: int
+    logical_cpu_cores: int
+    avg_cpu_per_core_usage_percentage: float
+    cpu_usage_percent: float
+    cpu_freq_current_mhz : Optional[float] = None
+    cpu_freq_min_mhz : Optional[float] = None
+    cpu_freq_max_mhz : Optional[float] = None
+    memory_total_gb: float
+    memory_used_gb: float
+    memory_free_gb: float
+    memory_usage_percent: float
+    swap_total_gb: float
+    swap_used_gb: float
+    swap_used_percent: float
+    total_disk_usage_gb: float
+    total_disk_size_gb: float
+    boot_time_utc: datetime
+    uptime_seconds: float
+    battery_present: bool
+    battery_percent: Optional[float] = None
+    battery_plugged_in: Optional[bool] = None
+    battery_time_left_seconds: Optional[float] = None
+    battery_time_left_approx: Optional[str] = None
+    battery_cycle_count: Optional[int] = None

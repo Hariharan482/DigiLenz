@@ -72,3 +72,22 @@ def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
     collection = mongodb.get_collection("asset_metrics")
     result = collection.insert_one(asset_metrics_dict)
     return result.inserted_id
+
+def categorize_assets()->dict:
+    """Categorize assets based on health score."""
+    result = {"good": 0, "moderate": 0, "critical": 0}
+    collection = mongodb.get_collection("assets")
+    cursor = collection.find({"health_score": {"$exists": True, "$ne": None}}, {"health_score": 1})
+    
+    for asset in cursor:
+        score = asset.get("health_score")
+        if score is None:
+            continue
+        if score > 85:
+            result["good"] += 1
+        elif score > 70:
+            result["moderate"] += 1
+        else:
+            result["critical"] += 1
+            
+    return result

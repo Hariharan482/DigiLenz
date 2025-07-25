@@ -7,6 +7,7 @@ from services.asset_service import (
     get_assets_list_service,
     get_asset_by_serial_number_service,
     get_assets_summary_paginated_service,
+    get_device_health_count
 )
 from typing import Dict
 
@@ -82,4 +83,14 @@ def get_asset_details(serial_number: str):
         return asset
     except Exception as e:
         logger.error(f"Error fetching asset details: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.get("/health-count")
+def get_device_health_assets():
+    """Get count of devices by health status."""
+    try:
+        health_count = get_device_health_count()
+        return health_count
+    except Exception as e:
+        logger.error(f"Error fetching device health count: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

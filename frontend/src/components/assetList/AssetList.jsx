@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { mockData } from "../../constants/AssetData";
 import styles from "../../pages/Asset/Asset.module.css";

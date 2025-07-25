@@ -1,3 +1,4 @@
+import datetime
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from core.logging import logger
@@ -35,7 +36,7 @@ def create_asset(asset: Dict):
         asset["customer_id"] = customer
         # Now validate and create Asset model
         asset_obj = Asset(**asset)
-
+        asset_obj.created_at = datetime.now()
         inserted_id = create_asset_service(asset_obj)
         if not inserted_id:
             logger.error("Asset not saved")
@@ -73,18 +74,6 @@ def list_assets(page: int = Query(1, ge=1), page_size: int = Query(10, ge=1, le=
         logger.error(f"Error fetching assets list: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.get("/{serial_number}")
-def get_asset_details(serial_number: str):
-    """Get asset details by serial number."""
-    try:
-        asset = get_asset_by_serial_number_service(serial_number)
-        if not asset:
-            raise HTTPException(status_code=404, detail="Asset not found")
-        return asset
-    except Exception as e:
-        logger.error(f"Error fetching asset details: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
 @router.get("/health-count")
 def get_device_health_assets():
     """Get count of devices by health status."""
@@ -115,4 +104,17 @@ def get_inactive_assets_count():
         return {"inactive_count": inactive_count}
     except Exception as e:
         logger.error(f"Error fetching inactive assets count: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
+
+@router.get("/{serial_number}")
+def get_asset_details(serial_number: str):
+    """Get asset details by serial number."""
+    try:
+        asset = get_asset_by_serial_number_service(serial_number)
+        if not asset:
+            raise HTTPException(status_code=404, detail="Asset not found")
+        return asset
+    except Exception as e:
+        logger.error(f"Error fetching asset details: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

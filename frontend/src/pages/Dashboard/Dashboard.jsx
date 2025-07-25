@@ -1,3 +1,4 @@
+import React from "react";
 import DeviceHealthOverview from "../../components/deviceHealthOverview/DeviceHealthOverview";
 import DeviceByAgeChart from "../../components/devicesByAgeChart/DevicesByAgeChart";
 import DeviceHealthSummary from "../../components/deviceHealthSummary/DeviceHealthSummary";

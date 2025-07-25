@@ -144,3 +144,14 @@
   display: inline-block;
   margin: 0 6px;
 }
+.asset-details-background {
+    position: absolute;
+    background-color: #8fa2b83d;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}

@@ -1,3 +1,4 @@
+import React from "react";
 import { navigation, RouteConstants } from "../../constants/AppConstants";
 import Navigation from "../../components/Navigation/Navigation";
 import logo from '../../assets/Mascot.svg';

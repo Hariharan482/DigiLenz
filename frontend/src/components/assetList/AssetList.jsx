@@ -1,11 +1,14 @@
+import React from "react";
 import { useState } from "react";
 import { mockData } from "../../constants/AssetData";
+import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
 
 const rowsPerPage = 8;
 
 const AssetList = () => {
   const [page, setPage] = useState(1);
+  const [assetDetails, setAssetDetails] = useState(false);
   const totalPages = Math.ceil(mockData.length / rowsPerPage);
   const startId = (page - 1) * rowsPerPage;
   const pageData = mockData.slice(startId, startId + rowsPerPage);
@@ -39,8 +42,8 @@ const AssetList = () => {
                   {row.status}
                 </span>
                 <span className={styles.actionLinks}>
-                  <a className={styles.actionLink}>Manage</a>
-                  <a className={styles.actionLink}>Notify</a>
+                  <div className={styles.actionLink} onClick={()=>setAssetDetails(true)}>Manage</div>
+                  <div className={styles.actionLink}>Notify</div>
                 </span>
               </td>
             </tr>
@@ -64,6 +67,7 @@ const AssetList = () => {
           &#62;
         </button>
       </div>
+      {assetDetails && <div className={styles['asset-details-background']}><div className={styles['asset-details-background']} onClick={()=>setAssetDetails(false)}></div> <AssetDetails close={()=>setAssetDetails(false)}/> </div>}
     </div>
   );
 };

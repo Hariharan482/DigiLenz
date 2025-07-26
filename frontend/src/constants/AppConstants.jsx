@@ -3,8 +3,6 @@ export const navigation = [
   "My Assets",
   "Experience Score",
   "Reports",
-  "Alerts",
-  "Settings",
   "Help",
 ];
 

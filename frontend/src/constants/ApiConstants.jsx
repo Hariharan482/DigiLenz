@@ -1,1 +1,6 @@
-export const assetListAPI = "http://digilenz.southindia.cloudapp.azure.com:8000/assets/list?";
+export const BACKEND_BASE_URL = import.meta.env.BACKEND_BASE_URL || "http://localhost:8000";
+
+export const ROUTE_CONSTANTS = {
+    ASSET_LIST: "/assets/list",
+}
+

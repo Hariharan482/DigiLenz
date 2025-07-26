@@ -6,7 +6,7 @@
 }
 .list-table{
     display: grid;
-    grid-template-columns: 120px 300px 200px 100px 100px 100px 120px 180px;
+    grid-template-columns: 170px 300px 200px 100px 100px 100px 120px 180px;
     background-color: #F9FAFB;
     border-bottom: 1px solid #E5E7EB;
     font-size: 14px;
@@ -18,7 +18,7 @@
 }
 .table-row{
     display: grid;
-    grid-template-columns: 120px 300px 200px 100px 100px 100px 120px 180px;
+    grid-template-columns: 170px 300px 200px 100px 100px 100px 120px 180px;
     font-size: 14px;
     color: #374151;
     border-bottom: 1px solid #E5E7EB;
@@ -38,4 +38,8 @@
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
+}
+.wide-column {
+  width: 500px; /* Or any width you want */
+  flex: 1.5; /* optional, if you're using flex layout */
 }

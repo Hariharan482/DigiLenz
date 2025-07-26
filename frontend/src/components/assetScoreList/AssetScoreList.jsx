@@ -1,100 +1,85 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import style from './AssetScoreList.module.css';
-export default function AssetScoreList() {
-    const devices = [
-        {
-            deviceId: 'DJHBJ334',
-            deviceName: 'Lenovo Idea Pad - Intel Ultra 9',
-            user: 'John Doe',
-            cpuScore: 65,
-            ramScore: 82,
-            diskScore: 45,
-            overallScore: 78,
-            lastUpdated: '24/07/2025, 10:30:00'
-        },
-        {
-            deviceId: 'KJNDLOW',
-            deviceName: 'MacBook Air - M4',
-            user: 'Jane Smith',
-            cpuScore: 92,
-            ramScore: 88,
-            diskScore: 95,
-            overallScore: 91,
-            lastUpdated: '24/07/2025, 10:30:00'
-        }
-    ];
+import { BACKEND_BASE_URL,ROUTE_CONSTANTS } from '../../constants/ApiConstants';
 
-    const getScoreStyle = (score) => {
-        if (score >= 85) {
-        return { backgroundColor: '#10b98149', color: '#0b8059ff' }; // Green for excellent
-        } else if (score >= 70) {
-        return { backgroundColor: '#f59f0b69', color: '#996408ff' }; // Yellow for good
-        } else {
-        return { backgroundColor: '#ef444461', color: '#731f1fff' }; // Red for poor
+export default function AssetScoreList() {
+  const [devices, setDevices] = useState([]);
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const response = await fetch(`${BACKEND_BASE_URL}${ROUTE_CONSTANTS.ASSET_LIST}`);
+        const data = await response.json();
+        if (data.assets) {
+          setDevices(data.assets);
         }
+      } catch (error) {
+        console.error('Failed to fetch devices:', error);
+      }
     };
 
-    return (
-      <div className={style['list-table-container']}>
-        <div className={style['list-table']}>
-          <div className={style['list-table-header']}>Device ID</div>
-          <div className={style['list-table-header']}>Device Name</div>
-          <div className={style['list-table-header']}>User</div>
-          <div className={style['list-table-header']}>CPU Score</div>
-          <div className={style['list-table-header']}>RAM Score</div>
-          <div className={style['list-table-header']}>Disk Score</div>
-          <div className={style['list-table-header']}>Overall Score</div>
-          <div className={style['list-table-header']}>Last Updated</div>
-        </div>
+    fetchDevices();
+  }, []);
 
-        {devices.map((device, index) => (
-          <div
-            className={style['table-row']}
-            key={index}>
-            <div className={style['row-device-data']}>
-              {device.deviceId}
-            </div>
-            <div className={style['row-device-data']}>
-              {device.deviceName}
-            </div>
-            <div className={style['row-device-data']}>
-              {device.user}
-            </div>
-            <div className={style['row-score-data']}>
-              <span className={style['score']} style={{
-                ...getScoreStyle(device.cpuScore)
-              }}>
-                {device.cpuScore}
-              </span>
-            </div>
-            <div className={style['row-score-data']}>
-              <span className={style['score']} style={{
-                ...getScoreStyle(device.ramScore)
-              }}>
-                {device.ramScore}
-              </span>
-            </div>
-            <div className={style['row-score-data']}>
-              <span className={style['score']} style={{
-                ...getScoreStyle(device.diskScore)
-              }}>
-                {device.diskScore}
-              </span>
-            </div>
-            <div className={style['row-score-data']}>
-              <span className={style['score']} style={{
-                ...getScoreStyle(device.overallScore)
-              }}>
-                {device.overallScore}
-              </span>
-            </div>
-            <div className={style['row-device-data']}>
-              {device.lastUpdated}
-            </div>
-          </div>
-        ))}
+  const getScoreStyle = (score) => {
+    if (score >= 85) {
+      return { backgroundColor: '#10b98149', color: '#0b8059ff' }; // Green for excellent
+    } else if (score >= 70) {
+      return { backgroundColor: '#f59f0b69', color: '#996408ff' }; // Yellow for good
+    } else {
+      return { backgroundColor: '#ef444461', color: '#731f1fff' }; // Red for poor
+    }
+  };
+
+  return (
+    <div className={style['list-table-container']}>
+      <div className={style['list-table']}>
+        <div className={`${style['list-table-header']} ${style['wide-column']}`}>Device ID</div>
+        <div className={style['list-table-header']}>Device Name</div>
+        <div className={style['list-table-header']}>Host Name</div>
+        <div className={style['list-table-header']}>CPU Score</div>
+        <div className={style['list-table-header']}>RAM Score</div>
+        <div className={style['list-table-header']}>Disk Score</div>
+        <div className={style['list-table-header']}>Overall Score</div>
+        <div className={style['list-table-header']}>Status</div>
       </div>
-    )
 
-
+      {devices.map((device, index) => (
+        <div className={style['table-row']} key={index}>
+          <div className={`${style['row-device-data']} ${style['wide-column']}`}>
+            {device.serial_number}
+          </div>
+          <div className={style['row-device-data']}>
+            {device.product_name}
+          </div>
+          <div className={style['row-device-data']}>
+            {device.host_name}
+          </div>
+          <div className={style['row-score-data']}>
+            <span className={style['score']} style={getScoreStyle(device.average_cpu)}>
+              {device.average_cpu}
+            </span>
+          </div>
+          <div className={style['row-score-data']}>
+            <span className={style['score']} style={getScoreStyle(device.average_memory)}>
+              {device.average_memory}
+            </span>
+          </div>
+          <div className={style['row-score-data']}>
+            <span className={style['score']} style={getScoreStyle(device.average_battery)}>
+              {device.average_battery}
+            </span>
+          </div>
+          <div className={style['row-score-data']}>
+            <span className={style['score']} style={getScoreStyle(device.health_score)}>
+              {device.health_score}
+            </span>
+          </div>
+          <div className={style['row-device-data']}>
+            {device.status || 'Unknown'}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

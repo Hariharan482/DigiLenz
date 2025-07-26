@@ -68,11 +68,11 @@ def assets_summary(page: int = Query(1, ge=1), page_size: int = Query(10, ge=1, 
 def list_assets(page: int = Query(1, ge=1), page_size: int = Query(10, ge=1, le=100)):
     """Paginated list of assets with serial_number, host_name, product_name, status."""
     try:
-        assets = get_assets_list_service(page, page_size)
-        return {"page": page, "page_size": page_size, "assets": assets}
+        return get_assets_list_service(page, page_size)
     except Exception as e:
         logger.error(f"Error fetching assets list: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
 
 @router.get("/health-count")
 def get_device_health_assets():

@@ -3,10 +3,13 @@ from utils.calculate_customer_experience_score import calculate_customer_experie
 from db.mongodb import mongodb
 from models.schemas import Asset, AssetMetrics
 from typing import List, Optional
+from typing import Dict
+import math
 
-def get_assets_paginated(page: int = 1, page_size: int = 10) -> List[dict]:
-    """Get paginated list of assets with basic info."""
+def get_assets_paginated(page: int = 1, page_size: int = 10) -> Dict:
+    """Return paginated asset list with total pages info (flat structure)."""
     collection = mongodb.get_collection("assets")
+    
     skip = (page - 1) * page_size
     projection = {
         "_id": 0,
@@ -20,8 +23,20 @@ def get_assets_paginated(page: int = 1, page_size: int = 10) -> List[dict]:
         "average_memory": 1,
         "customer_id": 1
     }
+
+    total_count = collection.count_documents({})
+    total_pages = math.ceil(total_count / page_size)
+
     cursor = collection.find({}, projection).skip(skip).limit(page_size)
-    return list(cursor)
+    assets = list(cursor)
+
+    return {
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+        "assets": assets
+    }
+
 
 def create_asset_db(asset: Asset) -> str:
     """Create a new asset in the database."""
@@ -72,6 +87,8 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
             "mac_address": 1,
             "customer_name": "$customer.customer_name",
             "status": 1,
+            "average_cpu": "$average_cpu",             
+            "average_battery": "$average_battery",    
             "os": "$latest_metrics.os",
             "os_release": "$latest_metrics.os_release",
             "os_version": "$latest_metrics.os_version",

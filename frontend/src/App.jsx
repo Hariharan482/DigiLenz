@@ -13,7 +13,7 @@ function App() {
     <div className="app">
       <Routes>
         <Route path={RouteConstants.home} element={<Layout />}>
-          <Route path={RouteConstants.dashboard} element={<Dashboard />} />
+          <Route path={RouteConstants.home} element={<Dashboard />} />
           <Route path={RouteConstants.myassets} element={<Asset />} />
           <Route
             path={RouteConstants.experiencescore}

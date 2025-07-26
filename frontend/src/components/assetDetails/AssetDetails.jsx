@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import style from './AssetDetails.module.css';
+import { BACKEND_BASE_URL, ROUTE_CONSTANTS } from '../../constants/ApiConstants';
 
 export default function AssetDetails({ close, serialNumber }) {
     const [activeTab, setActiveTab] = useState('Details');
@@ -13,7 +14,7 @@ export default function AssetDetails({ close, serialNumber }) {
         async function fetchAssetDetails() {
             try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:8000/assets/${serialNumber}`);
+                const response = await fetch(`${BACKEND_BASE_URL}${ROUTE_CONSTANTS.ASSETS}/${serialNumber}`);
                 if (!response.ok) throw new Error('Failed to fetch asset details');
                 const data = await response.json();
                 setAssetData(data);

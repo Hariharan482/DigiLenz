@@ -57,22 +57,22 @@ export default function AssetScoreList() {
           </div>
           <div className={style['row-score-data']}>
             <span className={style['score']} style={getScoreStyle(device.average_cpu)}>
-              {device.average_cpu}
+              {Math.round(device.average_cpu)}
             </span>
           </div>
           <div className={style['row-score-data']}>
             <span className={style['score']} style={getScoreStyle(device.average_memory)}>
-              {device.average_memory}
+              {Math.round(device.average_memory)}
             </span>
           </div>
           <div className={style['row-score-data']}>
             <span className={style['score']} style={getScoreStyle(device.average_battery)}>
-              {device.average_battery}
+              {Math.round(device.average_battery)}
             </span>
           </div>
           <div className={style['row-score-data']}>
             <span className={style['score']} style={getScoreStyle(device.health_score)}>
-              {device.health_score}
+              {Math.round(device.health_score)}
             </span>
           </div>
           <div className={style['row-device-data']}>

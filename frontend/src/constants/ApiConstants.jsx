@@ -2,5 +2,8 @@ export const BACKEND_BASE_URL = import.meta.env.BACKEND_BASE_URL || "http://loca
 
 export const ROUTE_CONSTANTS = {
     ASSET_LIST: "/assets/list",
+    ASSETS: "/assets",
+    ASSET_HEALTH_SUMMARY: "/assets/health-summary",
+    IN_ACTIVE_COUNT: "/assets/inactive-count",
 }
 

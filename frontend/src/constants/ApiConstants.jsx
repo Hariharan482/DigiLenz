@@ -5,5 +5,6 @@ export const ROUTE_CONSTANTS = {
     ASSETS: "/assets",
     ASSET_HEALTH_SUMMARY: "/assets/health-summary",
     IN_ACTIVE_COUNT: "/assets/inactive-count",
+    ASSET_SUMMARY: "/assets/summary",
 }
 

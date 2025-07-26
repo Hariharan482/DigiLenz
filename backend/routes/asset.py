@@ -59,7 +59,7 @@ def assets_summary(page: int = Query(1, ge=1), page_size: int = Query(10, ge=1, 
     """Paginated summary of assets with serial_number, customer_name, average metrics, and health score."""
     try:
         summary = get_assets_summary_paginated_service(page, page_size)
-        return {"page": page, "page_size": page_size, "summary": summary}
+        return {"page": page, "page_size": page_size, "summary":summary["summary"], "assets": summary["assets"]}
     except Exception as e:
         logger.error(f"Error fetching assets summary: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

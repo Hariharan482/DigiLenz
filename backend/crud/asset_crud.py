@@ -140,12 +140,14 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
     result = list(collection.aggregate(pipeline))
     return result[0] if result else None
 
-def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dict]:
-    """Get paginated summary with customer info and metrics."""
+def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
+    """Get paginated summary with customer info and metrics, including device status counts."""
+    
     collection = mongodb.get_collection("assets")
     skip = (page - 1) * page_size
-    
-    pipeline = [
+
+    # Paginated assets pipeline
+    paginated_pipeline = [
         {"$lookup": {
             "from": "customers",
             "localField": "customer_id",
@@ -165,13 +167,53 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> List[dic
             "average_cpu": 1,
             "average_battery": 1,
             "average_memory": 1,
-            "health_score": 1
+            "health_score": 1,
+            "last_active": 1
         }},
         {"$skip": skip},
         {"$limit": page_size}
     ]
-    
-    return list(collection.aggregate(pipeline))
+
+    score_pipeline = [
+        {
+            "$group": {
+                "_id": {
+                    "$switch": {
+                        "branches": [
+                            {"case": {"$gte": ["$health_score", 70]}, "then": "Excellent"},
+                            {"case": {"$gt": ["$health_score", 0]}, "then": "Needs Attention"},
+                        ],
+                        "default": "Unknown"
+                    }
+                },
+                "count": {"$sum": 1}
+            }
+        }
+    ]
+
+    paginated_assets = list(collection.aggregate(paginated_pipeline))
+    health_score_summary = list(collection.aggregate(score_pipeline))
+
+    summary = {
+        "Excellent Devices": 0,
+        "Need Attention": 0,
+        "Unknown Devices": 0
+    }
+
+    for item in health_score_summary:
+        category = item["_id"]
+        count = item["count"]
+        if category == "Excellent":
+            summary["Excellent Devices"] = count
+        elif category == "Needs Attention":
+            summary["Need Attention"] = count
+        elif category == "Unknown":
+            summary["Unknown Devices"] = count
+
+    return {
+        "assets": paginated_assets,
+        "summary": summary
+    }
 
 def categorize_assets()->dict:
     """Categorize assets based on health score."""

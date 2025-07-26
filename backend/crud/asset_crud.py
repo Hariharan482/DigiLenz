@@ -25,8 +25,8 @@ def get_assets_paginated(page: int = 1, page_size: int = 10) -> Dict:
     }
 
     total_count = collection.count_documents({})
-    active_count = collection.count_documents({"status": "active"})
-    inactive_count = collection.count_documents({"status": "inactive"})
+    active_count = collection.count_documents({"status": "Active"})
+    inactive_count = collection.count_documents({"status": "Inactive"})
     total_pages = math.ceil(total_count / page_size)
 
     cursor = collection.find({}, projection).skip(skip).limit(page_size)

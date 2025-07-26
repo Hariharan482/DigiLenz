@@ -180,6 +180,7 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
                 "_id": {
                     "$switch": {
                         "branches": [
+                            {"case": {"$or": [{"$eq": ["$last_active", None]},{"$not": ["$last_active"]}]},"then": "Unknown"},
                             {"case": {"$gte": ["$health_score", 70]}, "then": "Excellent"},
                             {"case": {"$gt": ["$health_score", 0]}, "then": "Needs Attention"},
                         ],
@@ -442,31 +443,33 @@ def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
             "last_active": datetime.now() 
         }}
     )
-
     return inserted_id
-
 
 def get_device_health_summary(score_threshold=70):
     """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
     collection = mongodb.get_collection("assets")
-    now = datetime.utcnow()
+    now = datetime.now()
+
     pipeline = [
         {
             "$match": {
-                "health_score": {"$exists": True},
-                "average_cpu": {"$exists": True}
+                "health_score": {"$exists": True, "$ne": 0},
+                "average_cpu": {"$exists": True, "$ne": 0},
+                "average_memory": {"$exists": True, "$ne": 0},
+                "average_battery": {"$exists": True, "$ne": 0}
             }
         },
         {
             "$addFields": {
                 "created": { "$toDate": "$_id" },
+                "now": "$$NOW" 
             }
         },
         {
             "$addFields": {
                 "ageInYears": {
                     "$divide": [
-                        {"$subtract": [now, "$created"]},
+                        {"$subtract": ["$now", "$created"]},
                         1000 * 60 * 60 * 24 * 365
                     ]
                 }

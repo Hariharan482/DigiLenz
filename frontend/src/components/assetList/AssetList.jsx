@@ -1,33 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
 import { BACKEND_BASE_URL } from "../../constants/ApiConstants";
 
-const rowsPerPage = 8;
+// const rowsPerPage = 8;
 
-const AssetList = () => {
-  const [page, setPage] = useState(1);
-  const [assets, setAssets] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
+const AssetList = ({assets,page,setPage,totalPages}) => {
   const [assetDetails, setAssetDetails] = useState(false);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState(null);
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_BASE_URL}/assets/list?page=${page}&page_size=${rowsPerPage}`,
-        );
-        const data = await response.json();
-        setAssets(data.assets);
-        setTotalPages(data.total_pages);
-      } catch (error) {
-        console.error("Failed to fetch asset data:", error);
-      }
-    };
+  console.log(page, totalPages);
+  
 
-    fetchAssets();
-  }, [page]);
 
   return (
     <div className={styles.assetTableWrapper}>
@@ -41,7 +25,7 @@ const AssetList = () => {
           </tr>
         </thead>
         <tbody>
-          {assets.map((asset, id) => (
+          {assets?.map((asset, id) => (
             <tr key={id}>
               <td>{asset.serial_number}</td>
               <td>{asset.host_name}</td>

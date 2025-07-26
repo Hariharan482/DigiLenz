@@ -3,7 +3,7 @@ import styles from "../../pages/Asset/Asset.module.css";
 import downloadExcel from "../../services/DownloadExcel";
 import { BACKEND_BASE_URL,ROUTE_CONSTANTS } from "../../constants/ApiConstants";
 
-const AssetActions = () => {
+const AssetActions = ({active,inactive}) => {
   const [loading, setLoading] = useState(false);
 
   const fetchAllAssetsAndDownload = async () => {
@@ -40,11 +40,11 @@ const AssetActions = () => {
     <div className={styles.assetSummaryContainer}>
       <div className={styles.assetCard}>
         <span>ACTIVE ASSETS</span>
-        <span>203</span>
+        <span>{active}</span>
       </div>
       <div className={`${styles.assetCard} ${styles.inactive}`}>
         <span>IN ACTIVE ASSETS</span>
-        <span>203</span>
+        <span>{inactive}</span>
       </div>
       <div
         className={`${styles.assetCard} ${styles.download}`}

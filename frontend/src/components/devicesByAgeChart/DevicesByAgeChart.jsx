@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect,useState} from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -8,27 +8,56 @@ import {
   Legend,
   Tooltip,
 } from "chart.js";
+
 import style from "./DeviceByAgeChart.module.css";
+import { BACKEND_BASE_URL,ROUTE_CONSTANTS } from "../../constants/ApiConstants";
+
 export default function DeviceHealthOverview() {
+    const [deviceByAge, setDeviceByAge] = useState([]);
+    const [ageRanges, setAgeRanges] = useState([]);
+  
+
+    useEffect(() => {
+          const fetchAssets = async () => {
+            try {
+              const response = await fetch(
+                `${BACKEND_BASE_URL}${ROUTE_CONSTANTS.DEVICES_BY_AGE}`
+              );
+              const data = await response.json();
+              setDeviceByAge(data);
+            } catch (error) {
+              console.error("Failed to fetch asset data:", error);
+            }
+          };
+          fetchAssets();
+    },[])
+
+    useEffect(()=>{
+      setAgeRanges(Object.keys(deviceByAge.good || deviceByAge.moderate || deviceByAge.critical || {}));
+
+    },[deviceByAge]);
+    
+    
+
   ChartJS.register(BarElement, CategoryScale, LinearScale, Legend, Tooltip);
   const data = {
-    labels: ["0-1yrs", "1-2yrs", "2-3yrs", ">3yrs"],
+    labels: ageRanges,
     datasets: [
       {
         label: "Good",
-        data: [10, 15, 10, 5],
+        data: ageRanges.map(range => deviceByAge.good?.[range] || 0),
         backgroundColor: "#4B9A8C",
         stack: "Stack 0",
       },
       {
         label: "Moderate",
-        data: [10, 18, 12, 8],
+        data: ageRanges.map(range => deviceByAge.moderate?.[range] || 0),
         backgroundColor: "#82C4AC",
         stack: "Stack 0",
       },
       {
         label: "Poor",
-        data: [7, 10, 18, 20],
+        data: ageRanges.map(range => deviceByAge.critical?.[range] || 0),
         backgroundColor: "#F37B71",
         stack: "Stack 0",
       },

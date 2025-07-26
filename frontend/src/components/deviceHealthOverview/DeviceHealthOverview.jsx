@@ -1,16 +1,34 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import style from "./DeviceHealthOverview.module.css";
+import { BACKEND_BASE_URL,ROUTE_CONSTANTS } from "../../constants/ApiConstants";
+
 export default function DeviceHealthOverview() {
   Chart.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+  const [healthCount, setHealthCount] = useState([]);
 
+  useEffect(() => {
+        const fetchAssets = async () => {
+          try {
+            const response = await fetch(
+              `${BACKEND_BASE_URL}${ROUTE_CONSTANTS.HEALTH_COUNT}`
+            );
+            const data = await response.json();
+            setHealthCount(data);
+          } catch (error) {
+            console.error("Failed to fetch asset data:", error);
+          }
+        };
+        fetchAssets();
+  },[])
+  
   const data = {
     labels: ["<50%", "<75%", "<90%"],
     datasets: [
       {
-        data: [2, 3, 4],
+        data: [healthCount.critical, healthCount.moderate, healthCount.good],
         backgroundColor: ["#FF8A50", "#4F46E5", "#FEB572"],
         borderWidth: 0,
         cutout: "65%",

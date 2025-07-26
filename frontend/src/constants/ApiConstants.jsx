@@ -5,5 +5,7 @@ export const ROUTE_CONSTANTS = {
     ASSETS: "/assets",
     ASSET_HEALTH_SUMMARY: "/assets/health-summary",
     IN_ACTIVE_COUNT: "/assets/inactive-count",
+    HEALTH_COUNT: "/assets/health-count",
+    DEVICES_BY_AGE: "/assets/devices-by-age",
 }
 

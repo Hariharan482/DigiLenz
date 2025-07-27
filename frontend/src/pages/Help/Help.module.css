@@ -1,0 +1,129 @@
+.helpContainer {
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 750px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #3498db #f8f9fa;
+}
+
+.helpContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.helpContainer::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.helpContainer::-webkit-scrollbar-thumb {
+    background-color: #3498db;
+    border-radius: 4px;
+    border: 2px solid #f8f9fa;
+}
+
+.section {
+    margin: clamp(1.5rem, 2vw, 2rem);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    background: #f8f9fa;
+    border-radius: 8px;
+    position: relative;
+    border: 1px solid #e1e4e8;
+}
+
+.sectionTitle {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 600;
+}
+
+.featureList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+}
+
+.featureItem {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    border-left: 4px solid #3498db;
+    background: #f8f9fa;
+    height: 100%;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.featureItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.featureIcon {
+    margin-right: 1rem;
+    color: #3498db;
+}
+
+.featureContent {
+    flex: 1;
+}
+
+.featureContent h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+.featureContent p {
+    margin: 0;
+    color: #666;
+    line-height: 1.5;
+    font-size: clamp(0.875rem, 1.2vw, 1rem);
+}
+
+@media (max-width: 768px) {
+    .helpContainer {
+        height: calc(100vh - 80px);
+        margin: 10px;
+        border-radius: 8px;
+    }
+
+    .section {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .featureList {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .helpContainer {
+        height: calc(100vh - 70px);
+        margin: 8px;
+        border-radius: 6px;
+    }
+
+    .section {
+        margin: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .featureItem {
+        padding: 0.75rem;
+    }
+    
+    .sectionTitle {
+        font-size: 1.25rem;
+    }
+}

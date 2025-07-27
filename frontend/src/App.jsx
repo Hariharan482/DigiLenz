@@ -7,6 +7,7 @@ import Asset from "./pages/Asset/Asset";
 import Layout from "./pages/Layout";
 import PageNotFound from "./pages/PageNotFound";
 import ExperienceScore from "./pages/ExperienceScore/ExperienceScore";
+import Help from "./pages/Help/Help";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           <Route path={RouteConstants.reports} element={<Asset />} />
           <Route path={RouteConstants.alerts} element={<Asset />} />
           <Route path={RouteConstants.settings} element={<Asset />} />
-          <Route path={RouteConstants.help} element={<Asset />} />
+          <Route path={RouteConstants.help} element={<Help />} />
           <Route path={RouteConstants.all} element={<PageNotFound />} />
         </Route>
       </Routes>

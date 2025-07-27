@@ -2,7 +2,7 @@ export const navigation = [
   "Dashboard",
   "My Assets",
   "Experience Score",
-  "Reports",
+  "Settings",
   "Help",
 ];
 

@@ -20,7 +20,7 @@ function App() {
             path={RouteConstants.experiencescore}
             element={<ExperienceScore />}
           />
-          <Route path={RouteConstants.reports} element={<Asset />} />
+          {/* <Route path={RouteConstants.reports} element={<Asset />} /> */}
           <Route path={RouteConstants.alerts} element={<Asset />} />
           <Route path={RouteConstants.settings} element={<Asset />} />
           <Route path={RouteConstants.help} element={<Help />} />

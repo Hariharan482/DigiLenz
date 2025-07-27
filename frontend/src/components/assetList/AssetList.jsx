@@ -5,11 +5,9 @@ import { BACKEND_BASE_URL } from "../../constants/ApiConstants";
 
 // const rowsPerPage = 8;
 
-const AssetList = ({assets,page,setPage,totalPages}) => {
+const AssetList = ({ assets, page, setPage, totalPages }) => {
   const [assetDetails, setAssetDetails] = useState(false);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState(null);
-  
-
 
   return (
     <div className={styles.assetTableWrapper}>
@@ -31,11 +29,7 @@ const AssetList = ({assets,page,setPage,totalPages}) => {
               <td>
                 <span className={styles.status}>
                   <span
-                    className={
-                      asset.status === "Active"
-                        ? `${styles.statusDot} ${styles.active}`
-                        : `${styles.statusDot} ${styles.inactive}`
-                    }
+                    className={asset.status === "Active" ? `${styles.statusDot} ${styles.active}` : `${styles.statusDot} ${styles.inactive}`}
                   ></span>
                   {asset.status}
                 </span>
@@ -49,7 +43,6 @@ const AssetList = ({assets,page,setPage,totalPages}) => {
                   >
                     Manage
                   </div>
-                  <div className={styles.actionLink}>Notify</div>
                 </span>
               </td>
             </tr>
@@ -59,19 +52,11 @@ const AssetList = ({assets,page,setPage,totalPages}) => {
 
       {/* Pagination */}
       <div className={styles.paginationWrapper}>
-        <button
-          className={styles.paginationBtn}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-        >
+        <button className={styles.paginationBtn} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
           &#60;
         </button>
         <span className={styles.paginationDot}></span>
-        <button
-          className={styles.paginationBtn}
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-        >
+        <button className={styles.paginationBtn} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
           &#62;
         </button>
       </div>
@@ -79,14 +64,8 @@ const AssetList = ({assets,page,setPage,totalPages}) => {
       {/* Asset Details Modal */}
       {assetDetails && (
         <div className={styles["asset-details-background"]}>
-          <div
-            className={styles["asset-details-background"]}
-            onClick={() => setAssetDetails(false)}
-          ></div>
-          <AssetDetails
-            close={() => setAssetDetails(false)}
-            serialNumber={selectedSerialNumber}
-          />
+          <div className={styles["asset-details-background"]} onClick={() => setAssetDetails(false)}></div>
+          <AssetDetails close={() => setAssetDetails(false)} serialNumber={selectedSerialNumber} />
         </div>
       )}
     </div>

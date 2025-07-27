@@ -10,7 +10,3 @@ class MongoDB:
         return self.db[collection_name]
 
 mongodb = MongoDB()
-
-# Example usage:
-# collection = mongodb.get_collection("assets")
-# result = collection.find_one({})

@@ -84,8 +84,7 @@ class SystemMetrics:
 
     def get_os_version(self):
         if self.os_type == "darwin":
-            full_version = platform.version()  # e.g. "Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:49 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T6000"
-            # Extract "Darwin Kernel Version 24.5.0"
+            full_version = platform.version()
             import re
             match = re.match(r"(Darwin Kernel Version \d+(\.\d+)+)", full_version)
             if match:
@@ -98,7 +97,7 @@ class SystemMetrics:
         """Returns the primary MAC address as a string."""
         mac_int = uuid.getnode()
         if (mac_int >> 40) % 2:
-            return None  # Probably random MAC, not a real one
+            return None
         return ':'.join(['{:02x}'.format((mac_int >> 8*i) & 0xff) for i in reversed(range(6))])
 
     def get_device_name(self):
@@ -390,12 +389,33 @@ class SystemMetrics:
                 therm_metrics["cpu_temperatures_c"] = temps_list
         return therm_metrics
 
+def store_metrics(metrics_data):
+    """Store metrics in a local JSON file."""
+    storage_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stored_metrics")
+    os.makedirs(storage_dir, exist_ok=True)
+    
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    file_path = os.path.join(storage_dir, f"metrics_{current_date}.json")
+    
+    existing_data = []
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r') as f:
+                existing_data = json.load(f)
+        except json.JSONDecodeError:
+            pass
+    existing_data.append(metrics_data)
+    with open(file_path, 'w') as f:
+        json.dump(existing_data, f, indent=2)
+    
+    print(f"Stored metrics at {metrics_data['timestamp']}")
+
 def send_metrics(api_url, data):
     try:
         headers = {"Content-Type": "application/json"}
         resp = requests.post(api_url, data=json.dumps(data), headers=headers, timeout=10)
         if resp.status_code in (200, 201):
-            print(f"Successfully sent metrics at {data['timestamp']}")
+            print(f"Successfully sent metrics batch at {datetime.datetime.now().isoformat()}")
             return True
         else:
             print(f"Failed to send metrics! Status: {resp.status_code}. Response: {resp.text}")
@@ -403,14 +423,91 @@ def send_metrics(api_url, data):
         print(f"Error sending metrics: {e}")
     return False
 
+def get_unsent_dates():
+    """Get a list of dates that have stored metrics files."""
+    storage_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stored_metrics")
+    if not os.path.exists(storage_dir):
+        return []
+    
+    dates = []
+    today = datetime.datetime.now().date()
+    for file in os.listdir(storage_dir):
+        if file.startswith("metrics_") and file.endswith(".json"):
+            date_str = file[8:-5]
+            try:
+                file_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+                if file_date < today:
+                    dates.append(date_str)
+            except ValueError:
+                continue
+    return sorted(dates)
+
+def send_stored_metrics(api_url, date_str):
+    """Send stored metrics for a specific date and delete the file after successful send."""
+    storage_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stored_metrics")
+    if not os.path.exists(storage_dir):
+        return False
+    
+    file_path = os.path.join(storage_dir, f"metrics_{date_str}.json")
+    
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r') as f:
+                stored_metrics = json.load(f)
+            
+            if send_metrics(api_url, stored_metrics):
+                os.remove(file_path)
+                print(f"Successfully sent and cleared metrics for {date_str}")
+                return True
+            else:
+                print(f"Failed to send metrics for {date_str}, file retained for retry")
+        except Exception as e:
+            print(f"Error processing stored metrics for {date_str}: {e}")
+    return False
+
+def check_internet():
+    """Check if we have internet connectivity by trying to reach a reliable host."""
+    try:
+        socket.create_connection(("8.8.8.8", 53), timeout=3)
+        return True
+    except OSError:
+        return False
+
+def try_send_stored_data(api_url):
+    """Attempt to send all stored data when internet is available."""
+    if not check_internet():
+        print("No internet connection available, will try again later")
+        return False
+    all_dates = get_unsent_dates()
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                  "stored_metrics", f"metrics_{today}.json")):
+        all_dates.append(today)
+
+    success = True
+    for date in all_dates:
+        if not send_stored_metrics(api_url, date):
+            success = False
+            break
+    
+    return success
+
 def main():
     api_url = "http://digilenz.southindia.cloudapp.azure.com:8000/asset-metrics"
     metrics = SystemMetrics()
+    last_send_attempt = 0
+    send_interval = 300
+    
     while True:
+        current_time = time.time()
+        if current_time - last_send_attempt >= send_interval:
+            if try_send_stored_data(api_url):
+                print("Successfully sent all stored metrics")
+            last_send_attempt = current_time
         all_metrics = metrics.collect_metrics()
         print(json.dumps(all_metrics, indent=2))
-        send_metrics(api_url, all_metrics)
-        time.sleep(300)  # 5 minutes
+        store_metrics(all_metrics)
+        time.sleep(300)
 
 if __name__ == "__main__":
     main()

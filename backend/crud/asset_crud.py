@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from utils.calculate_customer_experience_score import calculate_customer_experience_score
 from db.mongodb import mongodb
 from models.schemas import Asset, AssetMetrics
-from typing import List, Optional
 from typing import Dict
 import math
+from core.logging import logger
 
 def get_assets_paginated(page: int = 1, page_size: int = 10) -> Dict:
     """Return paginated asset list with total pages info (flat structure)."""
@@ -59,19 +59,12 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
             "from": "asset_metrics",
             "let": {"asset_serial": "$serial_number"},
             "pipeline": [
-                {
-                    "$match": {
-                        "$expr": {"$eq": ["$serial_number", "$$asset_serial"]}
-                    }
-                },
+                {"$match": {"$expr": {"$eq": ["$serial_number", "$$asset_serial"]}}},
                 {"$sort": {"timestamp": -1}},
-                {"$limit": 1}
+                {"$limit": 10},
+                {"$project": {"_id": 0, "id": 0}}
             ],
-            "as": "latest_metrics"
-        }},
-        {"$unwind": {
-            "path": "$latest_metrics",
-            "preserveNullAndEmptyArrays": True
+            "as": "metrics_history"
         }},
         {"$lookup": {
             "from": "customers",
@@ -79,10 +72,7 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
             "foreignField": "customer_id",
             "as": "customer"
         }},
-        {"$unwind": {
-            "path": "$customer",
-            "preserveNullAndEmptyArrays": True
-        }},
+        {"$unwind": {"path": "$customer", "preserveNullAndEmptyArrays": True}},
         {"$project": {
             "_id": 0,
             "device_name": "$product_name",
@@ -91,58 +81,16 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
             "mac_address": 1,
             "customer_name": "$customer.customer_name",
             "status": 1,
-            "average_cpu": "$average_cpu",             
-            "average_battery": "$average_battery",    
-            "os": "$latest_metrics.os",
-            "os_release": "$latest_metrics.os_release",
-            "os_version": "$latest_metrics.os_version",
-            "architecture": "$latest_metrics.architecture",
-            "machine": "$latest_metrics.machine",
-            "processor": "$latest_metrics.processor",
-            "python_version": "$latest_metrics.python_version",
-            "timestamp": "$latest_metrics.timestamp",
-            "system_specs": {
-                "physical_cpu_cores": "$latest_metrics.physical_cpu_cores",
-                "logical_cpu_cores": "$latest_metrics.logical_cpu_cores",
-                "cpu_freq": {
-                    "current": "$latest_metrics.cpu_freq_current_mhz",
-                    "min": "$latest_metrics.cpu_freq_min_mhz",
-                    "max": "$latest_metrics.cpu_freq_max_mhz"
-                },
-                "memory": {
-                    "total_gb": "$latest_metrics.memory_total_gb",
-                    "used_gb": "$latest_metrics.memory_used_gb",
-                    "free_gb": "$latest_metrics.memory_free_gb",
-                    "used_percent": "$latest_metrics.memory_used_percent"
-                },
-                "swap": {
-                    "total_gb": "$latest_metrics.swap_total_gb",
-                    "used_gb": "$latest_metrics.swap_used_gb",
-                    "used_percent": "$latest_metrics.swap_used_percent"
-                },
-                "disk": {
-                    "total_gb": "$latest_metrics.total_disk_size_gb",
-                    "used_gb": "$latest_metrics.total_disk_usage_gb",
-                    "used_percent": "$latest_metrics.total_disk_used_percent"
-                }
-            },
-            "performance": {
-                "cpu_usage_percent": "$latest_metrics.cpu_usage_percent",
-                "avg_cpu_per_core_percent": "$latest_metrics.avg_cpu_per_core_usage_percent",
-                "battery_health_percent": "$latest_metrics.battery_health",
-                "battery_present": "$latest_metrics.battery_present",
-                "battery_percent": "$latest_metrics.battery_percent"
-            },
-            "uptime": {
-                "boot_time_utc": "$latest_metrics.boot_time_utc",
-                "uptime_seconds": "$latest_metrics.uptime_seconds",
-                "uptime_hms": "$latest_metrics.uptime_hms"
-            }
+            "average_cpu": "$average_cpu",
+            "average_battery": "$average_battery",
+            "average_memory": "$average_memory",
+            "health_score": "$health_score",
+            "metrics_history": 1
         }}
     ]
-    
-    result = list(collection.aggregate(pipeline))
-    return result[0] if result else None
+
+    asset = next(collection.aggregate(pipeline), None)
+    return asset
 
 def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
     """Get paginated summary with customer info and metrics, including device status counts."""
@@ -220,154 +168,102 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
         "summary": summary
     }
 
-def categorize_assets()->dict:
-    """Categorize assets based on health score."""
-    try:
-        result = {"good": 0, "moderate": 0, "critical": 0, "unknown": 0}
-        collection = mongodb.get_collection("assets")
-        
-        # Use aggregation pipeline for better performance and error handling
-        pipeline = [
-            {
-                "$project": {
-                    "category": {
-                        "$cond": {
-                            "if": {"$eq": ["$health_score", None]},
-                            "then": "unknown",
-                            "else": {
-                                "$switch": {
-                                    "branches": [
-                                        {"case": {"$gt": ["$health_score", 85]}, "then": "good"},
-                                        {"case": {"$gt": ["$health_score", 70]}, "then": "moderate"},
-                                        {"case": {"$eq": ["$health_score", 0]}, "then": "unknown"},
-                                        {"case": {"$eq": ["$health_score", None]}, "then": "unknown"}                                        
-                                    ],
-                                    "default": "critical"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                "$group": {
-                    "_id": "$category",
-                    "count": {"$sum": 1}
+
+def _health_category_expr():
+    # Helper for MongoDB aggregation health category logic
+    return {
+        "$cond": {
+            "if": {"$eq": ["$health_score", None]},
+            "then": "unknown",
+            "else": {
+                "$switch": {
+                    "branches": [
+                        {"case": {"$gt": ["$health_score", 85]}, "then": "good"},
+                        {"case": {"$gt": ["$health_score", 70]}, "then": "moderate"},
+                        {"case": {"$eq": ["$health_score", 0]}, "then": "unknown"}
+                    ],
+                    "default": "critical"
                 }
             }
-        ]
-        
+        }
+    }
+
+def categorize_assets() -> dict:
+    """Categorize assets based on health score."""
+    result = {"good": 0, "moderate": 0, "critical": 0, "unknown": 0}
+    collection = mongodb.get_collection("assets")
+    pipeline = [
+        {"$project": {"category": _health_category_expr()}},
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}}
+    ]
+    try:
         categories = collection.aggregate(pipeline)
-        
         for category in categories:
             result[category["_id"]] = category["count"]
-            
         return result
     except Exception as e:
-        print(f"Error categorizing assets: {str(e)}")
-        return {"good": 0, "moderate": 0, "critical": 0, "unknown": 0}
+        logger.error(f"Error categorizing assets: {str(e)}")
+        return result
 
-def get_devices_by_age()->dict:
-    try:
-        collection = mongodb.get_collection("assets")
-        now = datetime.now()
-        pipeline = [
-            {
-                "$match": {
-                    "created_at": {"$exists": True},
-                    "health_score": {"$exists": True}
-                }
+def get_devices_by_age() -> dict:
+    collection = mongodb.get_collection("assets")
+    pipeline = [
+        {"$match": {"created_at": {"$exists": True}, "health_score": {"$exists": True}}},
+        {"$addFields": {
+            "ageInYears": {
+                "$divide": [
+                    {"$subtract": ["$$NOW", "$created_at"]},
+                    1000 * 60 * 60 * 24 * 365
+                ]
             },
-            {
-                "$addFields": {
-                    "ageInYears": {
-                        "$divide": [
-                            {"$subtract": [now, "$created_at"]},
-                            1000 * 60 * 60 * 24 * 365  
-                        ]
-                    },
-                    "healthCategory": {
-                        "$cond": {
-                            "if": {"$eq": ["$health_score", None]},
-                            "then": "unknown",
-                            "else": {
-                                "$switch": {
-                                    "branches": [
-                                        {"case": {"$gt": ["$health_score", 85]}, "then": "good"},
-                                        {"case": {"$gt": ["$health_score", 70]}, "then": "moderate"},
-                                        {"case": {"$eq": ["$health_score", 0]}, "then": "unknown"},
-                                    ],
-                                    "default": "critical"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                "$addFields": {
-                    "ageGroup": {
-                        "$switch": {
-                            "branches": [
-                                {"case": {"$lte": ["$ageInYears", 1]}, "then": "0-1 year"},
-                                {"case": {"$lte": ["$ageInYears", 2]}, "then": "1-2 years"}
-                            ],
-                            "default": "2+ years"
-                        }
-                    }
-                }
-            },
-            {
-                "$group": {
-                    "_id": {
-                        "healthCategory": "$healthCategory",
-                        "ageGroup": "$ageGroup"
-                    },
-                    "count": {"$sum": 1}
-                }
-            },
-            {
-                "$sort": {
-                    "_id.healthCategory": 1,
-                    "_id.ageGroup": 1
+            "healthCategory": _health_category_expr()
+        }},
+        {"$addFields": {
+            "ageGroup": {
+                "$switch": {
+                    "branches": [
+                        {"case": {"$lte": ["$ageInYears", 1]}, "then": "0-1 year"},
+                        {"case": {"$lte": ["$ageInYears", 2]}, "then": "1-2 years"}
+                    ],
+                    "default": "2+ years"
                 }
             }
-        ]
-
+        }},
+        {"$group": {
+            "_id": {"healthCategory": "$healthCategory", "ageGroup": "$ageGroup"},
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id.healthCategory": 1, "_id.ageGroup": 1}}
+    ]
+    try:
         aggregated_result = list(collection.aggregate(pipeline))
         result = {"good": {}, "moderate": {}, "critical": {}, "unknown": {}}
-
-        # Initialize all possible age groups for each category
         age_groups = ["0-1 year", "1-2 years", "2+ years"]
         for category in result.keys():
             for age_group in age_groups:
                 result[category][age_group] = 0
-
         for asset in aggregated_result:
             category = asset["_id"]["healthCategory"]
             age_group = asset["_id"]["ageGroup"]
             count = asset["count"]
-            result[category][age_group] = count    
+            result[category][age_group] = count
         return result
     except Exception as e:
-        print(f"Error getting devices by age: {str(e)}")
+        logger.error(f"Error getting devices by age: {str(e)}")
         return {"good": {}, "moderate": {}, "critical": {}, "unknown": {}}
 
 
 def get_inactive_assets_count() -> int:
     """Get count of inactive assets."""
+    collection = mongodb.get_collection("assets")
+    now = datetime.now()
     try:
-        collection = mongodb.get_collection("assets")
-        now = datetime.now()
         threshold_date = now.replace(month=now.month - 3)
         return collection.count_documents({
-            "last_active": {
-                "$exists": True,
-                "$lt": threshold_date
-            }
+            "last_active": {"$exists": True, "$lt": threshold_date}
         })
     except Exception as e:
-        print(f"Error getting inactive assets count: {str(e)}")
+        logger.error(f"Error getting inactive assets count: {str(e)}")
         return 0
 
 def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
@@ -424,16 +320,6 @@ def create_asset_metrics_db(asset_metrics: AssetMetrics) -> str:
         average_memory=avg_memory,
         average_battery=avg_battery
     )
-
-    result_one = {
-        "health_score": ces_score,
-        "average_cpu": avg_cpu,
-        "average_memory": avg_memory,
-        "average_battery": avg_battery,
-        "last_active": datetime.now()
-    }
-    
-    print(result_one)
 
     # Update the Asset document with score and averages
     assets_collection = mongodb.get_collection("assets")

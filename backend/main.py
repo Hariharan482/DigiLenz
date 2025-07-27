@@ -4,8 +4,15 @@ from routes.asset import router as asset_router
 from routes.assetMetrics import router as asset_metrics_router
 from routes.customer import router as customer_router   
 from fastapi.middleware.cors import CORSMiddleware  
+from fastapi import Request
 
 app = FastAPI()
+
+@app.middleware("http")
+async def log_request_access(request: Request, call_next):
+    logger.info(f"Accessed {request.method} {request.url.path}")
+    response = await call_next(request)
+    return response
 
 app.add_middleware(
     CORSMiddleware,

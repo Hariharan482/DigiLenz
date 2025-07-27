@@ -19,10 +19,10 @@ class Asset(BaseModel):
     average_memory: Optional[float] = None
     last_active: datetime
     created_at: datetime 
-    customer_id: Customer  # Reference to Customer
+    customer_id: Customer
     
 class AssetMetrics(BaseModel):
-    id: Optional[str] = None  # _id in MongoDB
+    id: Optional[str] = None
     hostname: str
     serial_number: str
     device_name: str

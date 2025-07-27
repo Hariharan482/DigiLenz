@@ -7,15 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",  # React frontend
-    "http://127.0.0.1:3000",  # Optional - some setups use 127.0.0.1
-    "*",  # Allow all (not recommended for production)
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,7 +23,3 @@ def read_root():
 app.include_router(asset_router)
 app.include_router(asset_metrics_router)
 app.include_router(customer_router)
-
-# Future: Include routers from routes folder here
-# from routes import example_router
-# app.include_router(example_router)

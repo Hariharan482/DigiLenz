@@ -6,6 +6,23 @@ from typing import Dict
 import math
 from core.logging import logger
 
+def get_all_assets() -> list:
+    collection = mongodb.get_collection("assets")
+    projection = {
+        "_id": 0,
+        "serial_number": 1,
+        "product_name": 1,
+        "host_name": 1,
+        "status": 1,
+        "health_score": 1,
+        "average_cpu": 1,
+        "average_battery": 1,
+        "average_memory": 1,
+        "customer_id": 1
+    }
+    cursor = collection.find({}, projection)
+    return list(cursor)
+
 def get_assets_paginated(page: int = 1, page_size: int = 10) -> Dict:
     """Return paginated asset list with total pages info (flat structure)."""
     collection = mongodb.get_collection("assets")

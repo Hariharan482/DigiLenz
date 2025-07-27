@@ -2,7 +2,6 @@ export const navigation = [
   "Dashboard",
   "My Assets",
   "Experience Score",
-  "Alerts",
   "Help",
 ];
 
@@ -11,7 +10,6 @@ export const icons = {
   myassets: "business_center",
   experiencescore: "speed",
   reports: "show_chart",
-  alerts: "notification_important",
   settings: "settings",
   help: "help",
 };
@@ -23,7 +21,6 @@ export const RouteConstants = {
   myassets: "/asset",
   experiencescore: "/experience-score",
   reports: "/report",
-  alerts: "/alerts",
   settings: "/settings",
   help: "/help",
 };

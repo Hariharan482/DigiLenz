@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from core.logging import logger
 from routes.asset import router as asset_router
 from routes.assetMetrics import router as asset_metrics_router
-from routes.customer import router as customer_router   
+from routes.customer import router as customer_router
+from routes.email_report import router as email_report_router
 from fastapi.middleware.cors import CORSMiddleware  
 from fastapi import Request
 
@@ -30,3 +31,4 @@ def read_root():
 app.include_router(asset_router)
 app.include_router(asset_metrics_router)
 app.include_router(customer_router)
+app.include_router(email_report_router)

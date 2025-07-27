@@ -1,6 +1,5 @@
-
 from models.schemas import Asset
-from crud.asset_crud import categorize_assets, create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated, get_devices_by_age, get_inactive_assets_count, get_device_health_summary
+from crud.asset_crud import categorize_assets, create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated, get_devices_by_age, get_inactive_assets_count, get_device_health_summary, get_all_assets
 from typing import List, Optional
 
 def create_asset_service(asset: Asset) -> str:
@@ -34,3 +33,7 @@ def get_inactive_assets_count_service() -> int:
 def get_device_health_summary_service(score_threshold: int = 70) -> dict:
     """Get summary of device health including average age, health score, CPU utilization, and percentage below threshold."""
     return get_device_health_summary(score_threshold)
+
+def get_all_assets_service() -> list:
+    """Get all assets as a list (for download/email)."""
+    return get_all_assets()

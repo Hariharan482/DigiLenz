@@ -19,7 +19,7 @@ class Asset(BaseModel):
     average_memory: Optional[float] = None
     last_active: datetime
     created_at: datetime 
-    customer_id: Customer
+    customer_id: str
     
 class AssetMetrics(BaseModel):
     id: Optional[str] = None

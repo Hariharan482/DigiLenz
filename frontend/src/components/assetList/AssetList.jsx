@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
-import { BACKEND_BASE_URL } from "../../constants/ApiConstants";
-
-// const rowsPerPage = 8;
 
 const AssetList = ({ assets, page, setPage, totalPages }) => {
   const [assetDetails, setAssetDetails] = useState(false);

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from core.logging import logger
 from typing import Dict
+from models.schemas import Asset
 from datetime import datetime
 
 from services.asset_service import (
@@ -18,10 +19,11 @@ from services.asset_service import (
 router = APIRouter(prefix="/assets", tags=["assets"])
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_asset(asset: Dict):
+def create_asset(asset: Asset):
     """Create a new asset."""
     try:
-        asset["created_at"] = datetime.now()
+        if isinstance(asset, dict):
+            asset = Asset(**asset)
         inserted_id = create_asset_service(asset)
         if not inserted_id:
             logger.error("Asset not saved")

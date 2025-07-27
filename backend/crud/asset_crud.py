@@ -346,20 +346,20 @@ def get_device_health_summary(score_threshold=70):
                 "health_score": {"$exists": True, "$ne": 0},
                 "average_cpu": {"$exists": True, "$ne": 0},
                 "average_memory": {"$exists": True, "$ne": 0},
-                "average_battery": {"$exists": True, "$ne": 0}
+                "average_battery": {"$exists": True, "$ne": 0},
+                "created_at": {"$exists": True}
             }
         },
         {
             "$addFields": {
-                "created": { "$toDate": "$_id" },
-                "now": "$$NOW" 
+                "now": "$$NOW"
             }
         },
         {
             "$addFields": {
                 "ageInYears": {
                     "$divide": [
-                        {"$subtract": ["$now", "$created"]},
+                        {"$subtract": ["$now", "$created_at"]},
                         1000 * 60 * 60 * 24 * 365
                     ]
                 }

@@ -4,7 +4,7 @@ import AssetActions from "../../components/assetActions/AssetActions";
 import AssetList from "../../components/assetList/AssetList";
 import { BACKEND_BASE_URL } from "../../constants/ApiConstants";
 
-const rowsPerPage = 8;
+const rowsPerPage = 10;
 
 export default function Asset() {
 

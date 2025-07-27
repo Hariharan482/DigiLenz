@@ -1,89 +1,107 @@
-import React from "react";
-import style from "./AssetScoreList.module.css";
+import React, { useMemo } from "react";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
 
 export default function AssetScoreList({ devices }) {
   const getScoreStyle = (score) => {
     if (score >= 85) {
-      return { backgroundColor: "#10b98149", color: "#0b8059ff" }; // Green for excellent
+      return { backgroundColor: "#10b98149", color: "#0b8059ff" }; // Green
     } else if (score >= 70) {
-      return { backgroundColor: "#f59f0b69", color: "#996408ff" }; // Yellow for good
+      return { backgroundColor: "#f59f0b69", color: "#996408ff" }; // Yellow
     } else {
-      return { backgroundColor: "#ef444461", color: "#731f1fff" }; // Red for poor
+      return { backgroundColor: "#ef444461", color: "#731f1fff" }; // Red
     }
   };
 
-  return (
-    <div className={style["list-table-container"]}>
-      <div className={style["list-table"]}>
-        <div
-          className={`${style["list-table-header"]} ${style["wide-column"]}`}
-        >
-          Device ID
-        </div>
-        <div className={style["list-table-header"]}>Device Name</div>
-        <div className={style["list-table-header"]}>Host Name</div>
-        <div className={style["list-table-header"]}>CPU Score</div>
-        <div className={style["list-table-header"]}>RAM Score</div>
-        <div className={style["list-table-header"]}>Disk Score</div>
-        <div className={style["list-table-header"]}>Overall Score</div>
-        <div className={style["list-table-header"]}>Last Active</div>
-      </div>
-
-      {devices.length &&
-        devices.map((device, index) => (
-          <div className={style["table-row"]} key={index}>
-            <div
-              className={`${style["row-device-data"]} ${style["wide-column"]}`}
-            >
-              {device.serial_number}
-            </div>
-            <div className={style["row-device-data"]}>
-              {device.product_name}
-            </div>
-            <div className={style["row-device-data"]}>{device.host_name}</div>
-            <div className={style["row-score-data"]}>
-              <span
-                className={style["score"]}
-                style={getScoreStyle(device.average_cpu)}
-              >
-                {Math.round(device.average_cpu)}
-              </span>
-            </div>
-            <div className={style["row-score-data"]}>
-              <span
-                className={style["score"]}
-                style={getScoreStyle(device.average_memory)}
-              >
-                {Math.round(device.average_memory)}
-              </span>
-            </div>
-            <div className={style["row-score-data"]}>
-              <span
-                className={style["score"]}
-                style={getScoreStyle(device.average_battery)}
-              >
-                {Math.round(device.average_battery)}
-              </span>
-            </div>
-            <div className={style["row-score-data"]}>
-              <span
-                className={style["score"]}
-                style={getScoreStyle(device.health_score)}
-              >
-                {Math.round(device.health_score)}
-              </span>
-            </div>
-            <div className={style["row-device-data"]}>
-              {device.last_active
-                ? new Date(device.last_active).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                  })
-                : "N/A"}
-            </div>
-          </div>
-        ))}
-    </div>
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "serial_number",
+        header: "Device ID",
+        size: 120,
+      },
+      {
+        accessorKey: "product_name",
+        header: "Device Name",
+        size: 150,
+      },
+      {
+        accessorKey: "host_name",
+        header: "Host Name",
+        size: 150,
+      },
+      {
+        accessorKey: "average_cpu",
+        header: "CPU Score",
+        size: 20,
+        Cell: ({ cell }) => (
+          <span style={getScoreStyle(cell.getValue())}>
+            {Math.round(cell.getValue())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "average_memory",
+        header: "RAM Score",
+        size: 20,
+        Cell: ({ cell }) => (
+          <span style={getScoreStyle(cell.getValue())}>
+            {Math.round(cell.getValue())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "average_battery",
+        header: "Disk Score",
+        size: 20,
+        Cell: ({ cell }) => (
+          <span style={getScoreStyle(cell.getValue())}>
+            {Math.round(cell.getValue())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "health_score",
+        header: "Overall Score",
+        size: 20,
+        Cell: ({ cell }) => (
+          <span style={getScoreStyle(cell.getValue())}>
+            {Math.round(cell.getValue())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "last_active",
+        header: "Last Active",
+        size: 160,
+        Cell: ({ cell }) => {
+          const value = cell.getValue();
+          return value
+            ? new Date(value).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A";
+        },
+      },
+    ],
+    []
   );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: devices || [],
+    enableSorting: true,
+    enableFiltering: true,
+    enablePagination: true,
+    initialState: { pagination: { pageSize: 5, pageIndex: 0 } },
+    muiTablePaginationProps: {
+      rowsPerPageOptions: [5],
+    },
+  });
+
+  return <MaterialReactTable table={table} />;
 }

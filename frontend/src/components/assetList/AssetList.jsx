@@ -8,8 +8,6 @@ import { BACKEND_BASE_URL } from "../../constants/ApiConstants";
 const AssetList = ({assets,page,setPage,totalPages}) => {
   const [assetDetails, setAssetDetails] = useState(false);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState(null);
-
-  console.log(page, totalPages);
   
 
 

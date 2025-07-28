@@ -457,3 +457,55 @@ def get_device_health_summary(score_threshold=70):
         "AvgCPUUtilizationPercent": round(data["avgCpu"], 2),
         "PercentDevicesBelowScoreThreshold": round(percent_below_threshold, 2)
     }
+
+def get_life_expectancy_categories() -> dict:
+    """Group assets by expected_life_years into defined life categories."""
+    collection = mongodb.get_collection("assets")
+    life_expectancy = {
+        "<2": 0,
+        "2-4": 0,
+        ">4": 0
+    }
+
+    pipeline = [
+        {
+            "$match": {
+                "expected_life_years": {"$exists": True, "$ne": None}
+            }
+        },
+        {
+            "$project": {
+                "expected_life_years": 1,
+                "bucket": {
+                    "$switch": {
+                        "branches": [
+                            {"case": {"$lt": ["$expected_life_years", 2]}, "then": "<2"},
+                            {"case": {"$and": [
+                                {"$gte": ["$expected_life_years", 2]},
+                                {"$lte": ["$expected_life_years", 4]}
+                            ]}, "then": "2-4"}
+                        ],
+                        "default": ">4"
+                    }
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": "$bucket",
+                "count": {"$sum": 1}
+            }
+        }
+    ]
+
+    try:
+        result = list(collection.aggregate(pipeline))
+        for item in result:
+            bucket = item["_id"]
+            count = item["count"]
+            life_expectancy[bucket] = count
+        return life_expectancy
+    except Exception as e:
+        logger.error(f"Error getting life expectancy distribution: {str(e)}")
+        return life_expectancy
+

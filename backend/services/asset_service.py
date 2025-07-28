@@ -1,5 +1,5 @@
 from models.schemas import Asset
-from crud.asset_crud import categorize_assets, create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated, get_devices_by_age, get_inactive_assets_count, get_device_health_summary, get_all_assets
+from crud.asset_crud import categorize_assets, create_asset_db, get_assets_paginated, get_asset_by_serial_number, get_assets_summary_paginated, get_devices_by_age, get_inactive_assets_count, get_device_health_summary, get_all_assets, get_life_expectancy_categories
 from typing import List, Optional
 
 def create_asset_service(asset: Asset) -> str:
@@ -37,3 +37,6 @@ def get_device_health_summary_service(score_threshold: int = 70) -> dict:
 def get_all_assets_service() -> list:
     """Get all assets as a list (for download/email)."""
     return get_all_assets()
+
+def get_life_expectancy_categories_service() -> dict:
+    return get_life_expectancy_categories()

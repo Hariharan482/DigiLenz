@@ -13,7 +13,8 @@ from services.asset_service import (
     get_device_health_count,
     get_devices_by_age_service,
     get_inactive_assets_count_service,
-    get_device_health_summary_service
+    get_device_health_summary_service,
+    get_life_expectancy_categories_service
 )
 
 router = APIRouter(prefix="/assets", tags=["assets"])
@@ -105,7 +106,22 @@ def get_device_health_summary(score_threshold: int = 70):
     except Exception as e:
         logger.error(f"Error fetching device health summary: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+    
 
+@router.get("/life-expectancy")
+def get_life_expectancy_categories():
+    """Get asset details by serial number."""
+    try:
+        data = get_life_expectancy_categories_service()
+        if not data:
+            raise HTTPException(status_code=404, detail="Asset not found")
+        return data
+    except Exception as e:
+        logger.error(f"Error fetching asset details: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# !!! WARNING: This endpoint should always be present below of all other endpoints !!! 
 @router.get("/{serial_number}")
 def get_asset_details(serial_number: str):
     """Get asset details by serial number."""
@@ -117,4 +133,4 @@ def get_asset_details(serial_number: str):
     except Exception as e:
         logger.error(f"Error fetching asset details: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
-    
+

@@ -9,4 +9,5 @@ export const ROUTE_CONSTANTS = {
   HEALTH_COUNT: "/assets/health-count",
   DEVICES_BY_AGE: "/assets/devices-by-age",
   ASSET_SUMMARY: "/assets/summary",
+  ASSET_LIFE_EXPECTANCY: "/assets/life-expectancy",
 };

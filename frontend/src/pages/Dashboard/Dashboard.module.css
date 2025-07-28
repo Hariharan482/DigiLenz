@@ -4,7 +4,7 @@
     align-items: flex-start;
     gap: 20px;
     padding: 50px;
-    height: 600px;
+    height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
 }

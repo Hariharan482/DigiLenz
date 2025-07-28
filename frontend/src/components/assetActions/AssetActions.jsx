@@ -84,7 +84,7 @@ const AssetActions = ({ active, inactive }) => {
         <span>{active}</span>
       </div>
       <div className={`${styles.assetCard} ${styles.inactive}`}>
-        <span>IN ACTIVE ASSETS</span>
+        <span>INACTIVE ASSETS</span>
         <span>{inactive}</span>
       </div>
       <div className={`${styles.assetCard} ${styles.download}`} onClick={fetchAllAssetsAndDownload}>

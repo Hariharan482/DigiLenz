@@ -125,7 +125,7 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
     muiTableProps: {
       sx: {
         "& .MuiTableHead-root": {
-          backgroundColor: "#f3e0e0",
+          backgroundColor: "#F3E0DF",
         },
         "& .MuiTableHead-root .MuiTableCell-root": {
           color: "#3d2323",
@@ -134,7 +134,7 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
         },
         "& .MuiTableBody-root .MuiTableRow-root": {
           backgroundColor: "#fff",
-          borderBottom: "1px solid #f3e0e0",
+          border: "1px solid #f3e0e0",
           "&:hover": {
             backgroundColor: "#f9f9f9",
           },
@@ -153,16 +153,13 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
     muiTableContainerProps: {
       sx: {
         backgroundColor: "#fff",
-        borderRadius: "16px",
         boxShadow: "0 2px 8px 0 rgba(0,0,0,0.1)",
         overflow: "scroll",
-        maxHeight: "450px",
-        height: "450px",
       },
     },
     muiTopToolbarProps: {
       sx: {
-        backgroundColor: "#fff",
+        backgroundColor: "#F3E0DF",
         borderRadius: "16px 16px 0 0",
         "& .MuiInputBase-root": {
           backgroundColor: "#f9f9f9",

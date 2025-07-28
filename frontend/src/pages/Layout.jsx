@@ -7,7 +7,7 @@ export default function Layout() {
   return (
     <>
       <NavBar />
-      <div style={{ width: "84%" }}>
+      <div style={{ width: "84%", overflowY: "hidden" }}>
         <Header />
         <Outlet />
       </div>

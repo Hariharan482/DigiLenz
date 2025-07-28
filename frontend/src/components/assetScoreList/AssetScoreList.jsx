@@ -214,12 +214,9 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     muiTableContainerProps: {
       sx: {
         backgroundColor: "#fff",
-        borderRadius: "12px",
         boxShadow:
           "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
         overflow: "scroll",
-        maxHeight: "450px",
-        height: "450px",
       },
     },
     muiTopToolbarProps: {

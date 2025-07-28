@@ -155,7 +155,9 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
         backgroundColor: "#fff",
         borderRadius: "16px",
         boxShadow: "0 2px 8px 0 rgba(0,0,0,0.1)",
-        overflow: "hidden",
+        overflow: "scroll",
+        maxHeight: "450px",
+        height: "450px",
       },
     },
     muiTopToolbarProps: {

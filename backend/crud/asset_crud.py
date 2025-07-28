@@ -18,10 +18,26 @@ def get_all_assets() -> list:
         "average_cpu": 1,
         "average_battery": 1,
         "average_memory": 1,
-        "customer_id": 1
+        "customer_id": 1,
+        "created_at": 1,
+        "expected_life_years": 1
     }
     cursor = collection.find({}, projection)
-    return list(cursor)
+    assets = []
+    now = datetime.now()
+    for doc in cursor:
+        asset = dict(doc)
+        created_at = asset.get("created_at")
+        if created_at:
+            try:
+                age_years = (now - created_at).total_seconds() / (365.25 * 24 * 60 * 60)
+                asset["age_years"] = round(age_years, 2)
+            except Exception:
+                asset["age_years"] = None
+        else:
+            asset["age_years"] = None
+        assets.append(asset)
+    return assets
 
 def get_assets_paginated(page: int = 1, page_size: int = 10) -> Dict:
     """Return paginated asset list with total pages info (flat structure)."""

@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
+import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import { Box } from "@mui/material";
 import AssetDetails from "../assetDetails/AssetDetails";
 import styles from "../../pages/Asset/Asset.module.css";
@@ -39,14 +36,14 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
         header: "Age (years)",
         size: 120,
         enableColumnFilter: false,
-        Cell: ({ cell }) => cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-",
+        Cell: ({ cell }) => (cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-"),
       },
       {
         accessorKey: "expected_life_years",
         header: "Expected Life (years)",
         size: 160,
         enableColumnFilter: false,
-        Cell: ({ cell }) => cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-",
+        Cell: ({ cell }) => (cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-"),
       },
       {
         accessorKey: "status",
@@ -62,13 +59,10 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
                 width: 8,
                 height: 8,
                 borderRadius: "50%",
-                backgroundColor:
-                  cell.getValue() === "Active" ? "#1ecb4f" : "#e13b3b",
+                backgroundColor: cell.getValue() === "Active" ? "#1ecb4f" : "#e13b3b",
               }}
             />
-            <span style={{ fontSize: "0.875rem", fontWeight: "500" }}>
-              {cell.getValue()}
-            </span>
+            <span style={{ fontSize: "0.875rem", fontWeight: "500" }}>{cell.getValue()}</span>
           </Box>
         ),
       },
@@ -195,11 +189,10 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
     },
     muiTablePaginationProps: {
       sx: {
-        "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-          {
-            color: "#3d2323",
-            fontWeight: "500",
-          },
+        "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+          color: "#3d2323",
+          fontWeight: "500",
+        },
         "& .MuiIconButton-root": {
           color: "#e13b3b",
           fontSize: "1.5rem",
@@ -243,14 +236,8 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
 
       {assetDetails && (
         <div className={styles["asset-details-background"]}>
-          <div
-            className={styles["asset-details-background"]}
-            onClick={() => setAssetDetails(false)}
-          ></div>
-          <AssetDetails
-            close={() => setAssetDetails(false)}
-            serialNumber={selectedSerialNumber}
-          />
+          <div className={styles["asset-details-background"]} onClick={() => setAssetDetails(false)}></div>
+          <AssetDetails close={() => setAssetDetails(false)} serialNumber={selectedSerialNumber} />
         </div>
       )}
     </div>

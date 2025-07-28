@@ -35,6 +35,20 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
         filterFn: "contains",
       },
       {
+        accessorKey: "age_years",
+        header: "Age (years)",
+        size: 120,
+        enableColumnFilter: false,
+        Cell: ({ cell }) => cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-",
+      },
+      {
+        accessorKey: "expected_life_years",
+        header: "Expected Life (years)",
+        size: 160,
+        enableColumnFilter: false,
+        Cell: ({ cell }) => cell.getValue() !== undefined && cell.getValue() !== null ? cell.getValue().toFixed(2) : "-",
+      },
+      {
         accessorKey: "status",
         header: "Status",
         size: 120,

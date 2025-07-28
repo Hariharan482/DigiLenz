@@ -21,7 +21,7 @@ def update_asset_life_estimate(serial_number: str, estimate: float):
     collection = mongodb.get_collection("assets")
     result = collection.update_one(
         {"serial_number": serial_number},
-        {"$set": {"expected_life_years": estimate, "expected_life_last_updated": datetime.utcnow()}}
+        {"$set": {"expected_life_years": estimate}}
     )
     if result.modified_count:
         logger.info(f"Updated {serial_number} with estimated life: {estimate:.2f} years")

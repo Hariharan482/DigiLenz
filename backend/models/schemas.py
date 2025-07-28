@@ -20,6 +20,7 @@ class Asset(BaseModel):
     last_active: datetime
     created_at: datetime 
     customer_id: str
+    expected_life_years: Optional[float] = None
     
 class AssetMetrics(BaseModel):
     id: Optional[str] = None

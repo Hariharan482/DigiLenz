@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: 10px;
   padding: 30px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .experience-score-heading {
   font-size: 30px;

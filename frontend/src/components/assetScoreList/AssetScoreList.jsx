@@ -3,35 +3,40 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 export default function AssetScoreList({ devices, page, setPage, totalPages }) {
-  const getScoreStyle = (score) => {
-    if (score >= 85) {
-      return {
-        backgroundColor: "#10b98149",
-        color: "#0b8059ff",
-        padding: "4px 8px",
-        borderRadius: "4px",
-        fontWeight: "500",
-      }; // Green
-    } else if (score >= 70) {
-      return {
-        backgroundColor: "#f59f0b69",
-        color: "#996408ff",
-        padding: "4px 8px",
-        borderRadius: "4px",
-        fontWeight: "500",
-      }; // Yellow
-    } else {
-      return {
-        backgroundColor: "#ef444461",
-        color: "#731f1fff",
-        padding: "4px 8px",
-        borderRadius: "4px",
-        fontWeight: "500",
-      }; // Red
-    }
-  };
+  const getScoreStyle = useMemo(
+    () => (score) => {
+      if (score >= 85) {
+        return {
+          backgroundColor: "#10b98149",
+          color: "#0b8059ff",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          fontWeight: "500",
+        };
+      } else if (score >= 70) {
+        return {
+          backgroundColor: "#f59f0b69",
+          color: "#996408ff",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          fontWeight: "500",
+        };
+      } else {
+        return {
+          backgroundColor: "#ef444461",
+          color: "#731f1fff",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          fontWeight: "500",
+        };
+      }
+    },
+    []
+  );
 
   const columns = useMemo(
     () => [
@@ -113,11 +118,10 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
         size: 130,
         enableColumnFilter: true,
         filterVariant: "range",
-        Cell: ({ cell }) => (
-          <span style={getScoreStyle(cell.getValue() || 0)}>
-            {Math.round(cell.getValue() || 0)}
-          </span>
-        ),
+        Cell: ({ cell }) => {
+          const score = cell.getValue() || 0;
+          return <span style={getScoreStyle(score)}>{Math.round(score)}</span>;
+        },
       },
       {
         accessorKey: "last_active",
@@ -156,6 +160,10 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     initialState: {
       showColumnFilters: false,
       showGlobalFilter: true,
+      pagination: {
+        pageIndex: page - 1,
+        pageSize: 5,
+      },
     },
     manualPagination: true,
     pageCount: Math.max(totalPages || 1, 1),
@@ -168,13 +176,8 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     },
     onPaginationChange: (updater) => {
       const currentPagination = { pageIndex: page - 1, pageSize: 10 };
-
-      let newPagination;
-      if (typeof updater === "function") {
-        newPagination = updater(currentPagination);
-      } else {
-        newPagination = updater;
-      }
+      const newPagination =
+        typeof updater === "function" ? updater(currentPagination) : updater;
 
       const newPage = newPagination.pageIndex + 1;
       if (newPage !== page && newPage >= 1) {
@@ -189,7 +192,6 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
         "& .MuiTableHead-root .MuiTableCell-root": {
           color: "#374151",
           fontWeight: "bold",
-          padding: "12px 8px",
         },
         "& .MuiTableBody-root .MuiTableRow-root": {
           backgroundColor: "#fff",
@@ -215,7 +217,7 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
         borderRadius: "12px",
         boxShadow:
           "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-        overflow: "hidden",
+        overflow: "scroll",
         maxHeight: "450px",
         height: "450px",
       },
@@ -236,10 +238,7 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
       sx: {
         backgroundColor: "#f8fafc",
         borderRadius: "0 0 12px 12px",
-        "& .MuiToolbar-root": {
-          minHeight: "56px",
-          padding: "16px",
-        },
+        "& .MuiToolbar-root": {},
       },
     },
     muiTablePaginationProps: {
@@ -287,5 +286,9 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <MaterialReactTable table={table} />
+    </LocalizationProvider>
+  );
 }

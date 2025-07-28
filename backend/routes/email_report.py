@@ -46,7 +46,7 @@ async def send_asset_report(
                 filename=file.filename or "AssetReport.xlsx"
             )
 
-        with smtplib.SMTP("smtp-mail.outlook.com", 587) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASS)
             server.send_message(msg)

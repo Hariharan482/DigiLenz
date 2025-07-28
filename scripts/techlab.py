@@ -394,25 +394,43 @@ def store_metrics(metrics_data):
     storage_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stored_metrics")
     os.makedirs(storage_dir, exist_ok=True)
     
+    # Use current date as filename
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     file_path = os.path.join(storage_dir, f"metrics_{current_date}.json")
     
-    existing_data = []
+    # Read existing data or create new list
+    stored_metrics = []
     if os.path.exists(file_path):
         try:
             with open(file_path, 'r') as f:
-                existing_data = json.load(f)
+                data = json.load(f)
+                stored_metrics = data.get("metrics", []) if isinstance(data, dict) else data
         except json.JSONDecodeError:
             pass
-    existing_data.append(metrics_data)
+    
+    # Append new metrics to the list
+    stored_metrics.append(metrics_data)
+    
+    # Save updated data in the correct format
+    stored_data = {"metrics": stored_metrics}
     with open(file_path, 'w') as f:
-        json.dump(existing_data, f, indent=2)
+        json.dump(stored_data, f, indent=2)
     
     print(f"Stored metrics at {metrics_data['timestamp']}")
 
 def send_metrics(api_url, data):
     try:
         headers = {"Content-Type": "application/json"}
+        # If data is a list or has a 'metrics' key, format it correctly
+        if isinstance(data, list):
+            data = {"metrics": data}
+        elif isinstance(data, dict) and "metrics" in data:
+            # Already in correct format
+            pass
+        else:
+            # Single metric object
+            data = {"metrics": [data]}
+            
         resp = requests.post(api_url, data=json.dumps(data), headers=headers, timeout=10)
         if resp.status_code in (200, 201):
             print(f"Successfully sent metrics batch at {datetime.datetime.now().isoformat()}")
@@ -433,14 +451,14 @@ def get_unsent_dates():
     today = datetime.datetime.now().date()
     for file in os.listdir(storage_dir):
         if file.startswith("metrics_") and file.endswith(".json"):
-            date_str = file[8:-5]
+            date_str = file[8:-5]  # Extract YYYY-MM-DD from metrics_YYYY-MM-DD.json
             try:
                 file_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-                if file_date < today:
+                if file_date < today:  # Only include past dates
                     dates.append(date_str)
             except ValueError:
                 continue
-    return sorted(dates)
+    return sorted(dates)  # Return dates in chronological order
 
 def send_stored_metrics(api_url, date_str):
     """Send stored metrics for a specific date and delete the file after successful send."""
@@ -468,6 +486,7 @@ def send_stored_metrics(api_url, date_str):
 def check_internet():
     """Check if we have internet connectivity by trying to reach a reliable host."""
     try:
+        # Try to connect to a reliable host (Google's DNS)
         socket.create_connection(("8.8.8.8", 53), timeout=3)
         return True
     except OSError:
@@ -478,6 +497,8 @@ def try_send_stored_data(api_url):
     if not check_internet():
         print("No internet connection available, will try again later")
         return False
+
+    # Get all dates with stored data, including today
     all_dates = get_unsent_dates()
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
@@ -496,18 +517,23 @@ def main():
     api_url = "http://digilenz.southindia.cloudapp.azure.com:8000/asset-metrics"
     metrics = SystemMetrics()
     last_send_attempt = 0
-    send_interval = 300
+    send_interval = 300  # Try to send every 5 minutes if there's stored data
     
     while True:
         current_time = time.time()
+        
+        # Try to send stored data every 5 minutes
         if current_time - last_send_attempt >= send_interval:
             if try_send_stored_data(api_url):
                 print("Successfully sent all stored metrics")
             last_send_attempt = current_time
+        
+        # Collect and store metrics
         all_metrics = metrics.collect_metrics()
         print(json.dumps(all_metrics, indent=2))
         store_metrics(all_metrics)
-        time.sleep(300)
+        
+        time.sleep(300)  # 5 minutes
 
 if __name__ == "__main__":
     main()

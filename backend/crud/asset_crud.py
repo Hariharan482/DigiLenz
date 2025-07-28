@@ -461,11 +461,7 @@ def get_device_health_summary(score_threshold=70):
 def get_life_expectancy_categories() -> dict:
     """Group assets by expected_life_years into defined life categories."""
     collection = mongodb.get_collection("assets")
-    life_expectancy = {
-        "<2": 0,
-        "2-4": 0,
-        ">4": 0
-    }
+    life_expectancy = {}
 
     pipeline = [
         {
@@ -479,13 +475,13 @@ def get_life_expectancy_categories() -> dict:
                 "bucket": {
                     "$switch": {
                         "branches": [
-                            {"case": {"$lt": ["$expected_life_years", 2]}, "then": "<2"},
+                            {"case": {"$lt": ["$expected_life_years", 2]}, "then": "<2 Years"},
                             {"case": {"$and": [
                                 {"$gte": ["$expected_life_years", 2]},
                                 {"$lte": ["$expected_life_years", 4]}
-                            ]}, "then": "2-4"}
+                            ]}, "then": "2-4 Years"}
                         ],
-                        "default": ">4"
+                        "default": ">4 Years"
                     }
                 }
             }

@@ -7,8 +7,13 @@ import {
 import style from "./ExpericenceScore.module.css";
 import ExperienceScoreCard from "../../components/experienceScoreCard/ExperienceScoreCard";
 import AssetScoreList from "../../components/assetScoreList/AssetScoreList";
+
+const rowsPerPage = 10;
+
 export default function ExperienceScore() {
+  const [page, setPage] = useState(1);
   const [devices, setDevices] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
   const [summary, setSummary] = useState({
     excellent: 0,
     needsAttention: 0,
@@ -19,12 +24,17 @@ export default function ExperienceScore() {
     const fetchDevices = async () => {
       try {
         const response = await fetch(
-          `${BACKEND_BASE_URL}${ROUTE_CONSTANTS.ASSET_SUMMARY}`
+          `${BACKEND_BASE_URL}${ROUTE_CONSTANTS.ASSET_SUMMARY}?page=${page}&page_size=${rowsPerPage}`
         );
         const data = await response.json();
+
         if (data.assets) {
           setDevices(data.assets || []);
         }
+        if (data.total_pages) {
+          setTotalPages(data.total_pages);
+        }
+
         if (data.summary) {
           setSummary({
             excellent: data.summary["Excellent Devices"] || 0,
@@ -38,7 +48,7 @@ export default function ExperienceScore() {
     };
 
     fetchDevices();
-  }, []);
+  }, [page]);
 
   return (
     <div className={style["experience-score-container"]}>
@@ -56,7 +66,12 @@ export default function ExperienceScore() {
         />
         <ExperienceScoreCard label="Unknown Devices" value={summary.unknown} />
       </div>
-      <AssetScoreList devices={devices} />
+      <AssetScoreList
+        devices={devices}
+        page={page}
+        setPage={setPage}
+        totalPages={totalPages}
+      />
     </div>
   );
 }

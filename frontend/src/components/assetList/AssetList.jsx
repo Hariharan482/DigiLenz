@@ -10,7 +10,7 @@ import styles from "../../pages/Asset/Asset.module.css";
 const AssetList = ({ assets, page, setPage, totalPages }) => {
   const [assetDetails, setAssetDetails] = useState(false);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState(null);
-  console.log(totalPages);
+
   const columns = useMemo(
     () => [
       {
@@ -101,13 +101,10 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
     initialState: {
       showColumnFilters: false,
       showGlobalFilter: true,
-      pagination: {
-        pageIndex: page - 1,
-        pageSize: 10,
-      },
     },
     manualPagination: true,
-    pageCount: useMemo(() => totalPages, [totalPages]),
+    pageCount: Math.max(totalPages || 1, 1),
+    rowCount: totalPages ? totalPages * 10 : assets?.length || 0,
     state: {
       pagination: {
         pageIndex: page - 1,
@@ -115,23 +112,16 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
       },
     },
     onPaginationChange: (updater) => {
-      const currentPagination = { pageIndex: page - 1, pageSize: 10 };
-
-      let newPagination;
-
       if (typeof updater === "function") {
-        newPagination = updater(currentPagination);
-      } else {
-        newPagination = updater;
-      }
+        const currentPagination = { pageIndex: page - 1, pageSize: 10 };
+        const newPagination = updater(currentPagination);
+        const newPage = newPagination.pageIndex + 1;
 
-      const newPage = newPagination.pageIndex + 1;
-
-      if (newPage !== page) {
-        setPage(newPage);
+        if (newPage !== page) {
+          setPage(newPage);
+        }
       }
     },
-
     muiTableProps: {
       sx: {
         "& .MuiTableHead-root": {
@@ -238,7 +228,6 @@ const AssetList = ({ assets, page, setPage, totalPages }) => {
     <div className={styles.assetTableWrapper}>
       <MaterialReactTable table={table} />
 
-      {/* Asset Details Modal */}
       {assetDetails && (
         <div className={styles["asset-details-background"]}>
           <div

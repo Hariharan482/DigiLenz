@@ -111,11 +111,11 @@ def get_asset_by_serial_number(serial_number: str) -> dict:
 
 def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
     """Get paginated summary with customer info and metrics, including device status counts."""
-    
     collection = mongodb.get_collection("assets")
     skip = (page - 1) * page_size
-
-    # Paginated assets pipeline
+    total_count = collection.count_documents({})
+    total_pages = math.ceil(total_count / page_size) if total_count > 0 else 1
+    
     paginated_pipeline = [
         {"$lookup": {
             "from": "customers",
@@ -142,14 +142,21 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
         {"$skip": skip},
         {"$limit": page_size}
     ]
-
+    
     score_pipeline = [
+        {"$lookup": {
+            "from": "customers",
+            "localField": "customer_id",
+            "foreignField": "customer_id",
+            "as": "customer"
+        }},
+        {"$unwind": "$customer"},
         {
             "$group": {
                 "_id": {
                     "$switch": {
                         "branches": [
-                            {"case": {"$or": [{"$eq": ["$last_active", None]},{"$not": ["$last_active"]}]},"then": "Unknown"},
+                            {"case": {"$or": [{"$eq": ["$last_active", None]}, {"$not": ["$last_active"]}]}, "then": "Unknown"},
                             {"case": {"$gte": ["$health_score", 70]}, "then": "Excellent"},
                             {"case": {"$gt": ["$health_score", 0]}, "then": "Needs Attention"},
                         ],
@@ -160,16 +167,16 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
             }
         }
     ]
-
+    
     paginated_assets = list(collection.aggregate(paginated_pipeline))
     health_score_summary = list(collection.aggregate(score_pipeline))
-
+    
     summary = {
         "Excellent Devices": 0,
         "Need Attention": 0,
         "Unknown Devices": 0
     }
-
+    
     for item in health_score_summary:
         category = item["_id"]
         count = item["count"]
@@ -179,12 +186,15 @@ def get_assets_summary_paginated(page: int = 1, page_size: int = 10) -> Dict:
             summary["Need Attention"] = count
         elif category == "Unknown":
             summary["Unknown Devices"] = count
-
+    
     return {
         "assets": paginated_assets,
-        "summary": summary
+        "summary": summary,
+        "total_pages": total_pages,
+        "current_page": page,
+        "page_size": page_size,
+        "total_count": total_count
     }
-
 
 def _health_category_expr():
     # Helper for MongoDB aggregation health category logic

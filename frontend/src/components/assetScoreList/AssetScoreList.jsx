@@ -221,8 +221,8 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     },
     muiTopToolbarProps: {
       sx: {
-        backgroundColor: "#fff",
-        borderRadius: "12px 12px 0 0",
+        backgroundColor: "#F8F8F8",
+        borderBottom: "1px solid #e5e7eb",
         "& .MuiInputBase-root": {
           backgroundColor: "#f9fafb",
           "&:hover": {
@@ -233,8 +233,7 @@ export default function AssetScoreList({ devices, page, setPage, totalPages }) {
     },
     muiBottomToolbarProps: {
       sx: {
-        backgroundColor: "#f8fafc",
-        borderRadius: "0 0 12px 12px",
+        backgroundColor: "#F8F8F8",
         "& .MuiToolbar-root": {},
       },
     },

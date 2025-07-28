@@ -4,3 +4,5 @@ uvicorn
 pymongo
 pydantic
 pydantic-settings
+openai
+apscheduler

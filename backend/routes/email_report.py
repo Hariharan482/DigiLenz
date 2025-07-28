@@ -9,8 +9,8 @@ from core.config import settings
 
 router = APIRouter()
 
-SMTP_USER = settings.smtp_user
-SMTP_PASS = settings.smtp_pass
+SMTP_USER = settings.SMTP_USER
+SMTP_PASS = settings.SMTP_PASS
 
 
 @router.get("/api/all-assets")
